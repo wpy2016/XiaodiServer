@@ -8,19 +8,19 @@ import (
 )
 
 type User struct {
-	ID            string  `json:"_id",bson:"_id"`
-	NickName      string  `json:"nick_name",bson:"nick_name"`         //昵称
-	RealName      string  `json:"real_name",bson:"real_name"`         //真实姓名
-	Phone         string  `json:"phone",bson:"phone"`                 //手机号
-	Pass          string  `json:"pass",bson:"pass"`                   //密码
-	UserType      int     `json:"user_type",bson:"user_type"`         //0表示普通用户，1表示笑递员
-	Campus        string  `json:"campus",bson:"campus"`               //学生所在学院
-	SchoolID      string  `json:"school_id",bson:"school_id"`         //学号
-	Img           string  `json:"img",bson:"img"`                     //头像
-	GoldMoney     float32 `json:"gold_money",bson:"gold_money"`       //金笑点
-	SilverMoney   float32 `json:"silver_money",bson:"silver_money"`   //银笑点
-	Creditibility float32 `json:"creditibility",bson:"creditibility"` //信誉度
-	Sign          string  `json:"sign",bson:"sign"`                   //签名
+	ID            string  `json:"_id" bson:"_id"`
+	NickName      string  `json:"nick_name" bson:"nick_name"`         //昵称
+	RealName      string  `json:"real_name" bson:"real_name"`         //真实姓名
+	Phone         string  `json:"phone" bson:"phone"`                 //手机号
+	Pass          string  `json:"pass" bson:"pass"`                   //密码
+	UserType      int     `json:"user_type" bson:"user_type"`         //0表示普通用户，1表示笑递员
+	Campus        string  `json:"campus" bson:"campus"`               //学生所在学院
+	SchoolID      string  `json:"school_id" bson:"school_id"`         //学号
+	Img           string  `json:"img" bson:"img"`                     //头像
+	GoldMoney     float32 `json:"gold_money" bson:"gold_money"`       //金笑点
+	SilverMoney   float32 `json:"silver_money" bson:"silver_money"`   //银笑点
+	Creditibility float32 `json:"creditibility" bson:"creditibility"` //信誉度
+	Sign          string  `json:"sign" bson:"sign"`                   //签名
 }
 
 func (user *User) Save() error {
@@ -43,7 +43,7 @@ func Update(user *User) error {
 	return nil
 }
 
-func isPhoneExist(phone string) (bool, error) {
+func IsPhoneExist(phone string) (bool, error) {
 	dialInfo := db.CreateDialInfo()
 	session, err := mgo.DialWithInfo(dialInfo)
 	if nil != err {
@@ -63,7 +63,7 @@ func isPhoneExist(phone string) (bool, error) {
 	return false, nil
 }
 
-func isNickNameExist(nickName string) (bool, error) {
+func IsNickNameExist(nickName string) (bool, error) {
 	dialInfo := db.CreateDialInfo()
 	session, err := mgo.DialWithInfo(dialInfo)
 	if nil != err {

@@ -6,7 +6,6 @@ import (
 	"XiaodiServer/models"
 	"XiaodiServer/models/resp"
 	"errors"
-	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"gopkg.in/mgo.v2/bson"
@@ -22,15 +21,24 @@ type UserController struct {
 }
 
 func Register(ctx *context.Context) {
-	defer func() {
-		if err := recover(); nil != err {
-			fmt.Println(err)
-		}
-	}()
+	defer CatchErr(ctx)
 	ctx.Request.ParseMultipartForm(32 << 20)
 	phone := ctx.Request.Form.Get(conf.USER_PHONE)
 	pass := ctx.Request.Form.Get(conf.USER_PASS)
 	nickName := ctx.Request.Form.Get(conf.USER_NICKNAME)
+
+	isPhoneExist, err := models.IsPhoneExist(phone)
+	if nil != err || isPhoneExist {
+		panic(GetBaseErrorResp(conf.ERROR_PHONE_IS_EXIST, conf.ERROR_PHONE_IS_EXIST_MSG))
+		return
+	}
+
+	isNickName, err := models.IsNickNameExist(nickName)
+	if nil != err || isNickName {
+		panic(GetBaseErrorResp(conf.ERROR_NICKNAME_EXIST, conf.ERROR_NICKNAME_EXIST_MSG))
+		return
+	}
+
 	file, fHead, _ := ctx.Request.FormFile("img")
 	imgPath, _ := uploadFile(file, fHead)
 	httpImgPath := conf.IMG_HEAD_HTTP + imgPath
@@ -69,7 +77,7 @@ func uploadFile(file multipart.File, fHead *multipart.FileHeader) (string, error
 	suffix := GetSuffix(fHead.Filename)
 	isValid := isValidSuffix(suffix)
 	if !isValid {
-		return "", errors.New(string(conf.ERROR_IMG_KIND_TYPE))
+		return "", errors.New(string(conf.ERROR_IMG_KIND_TYPE) + conf.ERROR_IMG_KIND_TYPE_MSG)
 	}
 	filename := bson.NewObjectId().Hex() + suffix
 
