@@ -13,11 +13,13 @@ import (
 )
 
 func init() {
-	ns := beego.NewNamespace("/user",
+	userRouter := beego.NewNamespace("/user",
 		beego.NSPost("/register", controllers.Register),
 		beego.NSPost("/login", controllers.Login),
 		beego.NSGet("/exist/nickname/:nickname", controllers.IsNickNameExist),
 		beego.NSGet("/exist/phone/:phone", controllers.IsPhoneExist),
 	)
-	beego.AddNamespace(ns)
+
+	beego.Get("/picture/:imgid", controllers.GetPicture)
+	beego.AddNamespace(userRouter)
 }

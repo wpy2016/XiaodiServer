@@ -1,38 +1,97 @@
 package models
 
-type User struct {
-	ID         string `json:"_id",bson:"_id"`
-	NickName   string `json:"nick_name",bson:"nick_name"`
-	RealName   string `json:"real_name",bson:"real_name"`
-	Phone      string `json:"phone",bson:"phone"`
-	Pass       string `json:"pass",bson:"pass"`
-	CreateTime string `json:"create_time",bson:"create_time"`
-	UserType   string `json:"user_type",bson:"user_type"`
-	Img        string `json:"img",bson:"img"`
-}
+import (
+	"XiaodiServer/conf"
+	"XiaodiServer/models/db"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+)
 
-type LinkedUser func() error
+type User struct {
+	ID            string  `json:"_id",bson:"_id"`
+	NickName      string  `json:"nick_name",bson:"nick_name"`         //昵称
+	RealName      string  `json:"real_name",bson:"real_name"`         //真实姓名
+	Phone         string  `json:"phone",bson:"phone"`                 //手机号
+	Pass          string  `json:"pass",bson:"pass"`                   //密码
+	UserType      int     `json:"user_type",bson:"user_type"`         //0表示普通用户，1表示笑递员
+	Campus        string  `json:"campus",bson:"campus"`               //学生所在学院
+	SchoolID      string  `json:"school_id",bson:"school_id"`         //学号
+	Img           string  `json:"img",bson:"img"`                     //头像
+	GoldMoney     float32 `json:"gold_money",bson:"gold_money"`       //金笑点
+	SilverMoney   float32 `json:"silver_money",bson:"silver_money"`   //银笑点
+	Creditibility float32 `json:"creditibility",bson:"creditibility"` //信誉度
+	Sign          string  `json:"sign",bson:"sign"`                   //签名
+}
 
 func (user *User) Save() error {
+	dialInfo := db.CreateDialInfo()
+	session, err := mgo.DialWithInfo(dialInfo)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+
+	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
+	user.ID = bson.NewObjectId().Hex()
+	err = userC.Insert(user)
+	return err
+}
+
+func Update(user *User) error {
 
 	return nil
 }
 
-func (user *User) IsPhoneUse(fun *LinkedUser) (bool, error) {
+func isPhoneExist(phone string) (bool, error) {
+	dialInfo := db.CreateDialInfo()
+	session, err := mgo.DialWithInfo(dialInfo)
+	if nil != err {
+		return false, err
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
 
+	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
+	count, err := userC.Find(bson.M{conf.USER_PHONE: phone}).Count()
+	if nil != err {
+		return false, err
+	}
+	if 0 != count {
+		return true, nil
+	}
 	return false, nil
 }
 
-func (user *User) isNickNameUse(fun *LinkedUser) (bool, error) {
+func isNickNameExist(nickName string) (bool, error) {
+	dialInfo := db.CreateDialInfo()
+	session, err := mgo.DialWithInfo(dialInfo)
+	if nil != err {
+		return false, err
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
 
+	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
+	count, err := userC.Find(bson.M{conf.USER_NICKNAME: nickName}).Count()
+	if nil != err {
+		return false, err
+	}
+	if 0 != count {
+		return true, nil
+	}
 	return false, nil
 }
 
-func (user *User) Update() error {
-
-	return nil
-}
-
-func (user *User) Login() error {
-	return nil
+func RegisterDefaultUser(phone, decryptPass, nickName, imgPath string) *User {
+	user := User{}
+	user.NickName = nickName
+	user.UserType = conf.NORMAL_USER
+	user.Creditibility = 5.0
+	user.GoldMoney = 0
+	user.Pass = decryptPass
+	user.SilverMoney = conf.DEFAULt_SLIVER_MONEY
+	user.Phone = phone
+	user.Img = imgPath
+	return &user
 }
