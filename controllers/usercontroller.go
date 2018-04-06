@@ -4,14 +4,12 @@ import (
 	"XiaodiServer/conf"
 	"XiaodiServer/encrypt"
 	"XiaodiServer/models"
-	"XiaodiServer/models/resp"
 	"errors"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"gopkg.in/mgo.v2/bson"
 	"io"
 	"mime/multipart"
-	"net/url"
 	"os"
 	"strings"
 )
@@ -46,8 +44,8 @@ func Register(ctx *context.Context) {
 	user := models.RegisterDefaultUser(phone, decryptPass, nickName, httpImgPath)
 	user.Save()
 
-	user.Pass = ""
-	userResp := &resp.UserResp{}
+	user.Pass = pass
+	userResp := &models.UserResp{}
 	userResp.StatusCode = conf.SUCCESS
 	userResp.StatusMsg = conf.SUCCESS_MSG
 	userResp.User = *user
@@ -55,21 +53,47 @@ func Register(ctx *context.Context) {
 }
 
 func Login(ctx *context.Context) {
+	defer CatchErr(ctx)
+	ctx.Request.ParseForm()
+	phone := ctx.Request.Form.Get(conf.USER_PHONE)
+	pass := ctx.Request.Form.Get(conf.USER_PASS)
+	decryptPass := encrypt.Base64AesDecrypt(pass)
+	user := models.Login(phone, decryptPass)
 
+	user.Pass = pass
+	userResp := &models.UserResp{}
+	userResp.StatusCode = conf.SUCCESS
+	userResp.StatusMsg = conf.SUCCESS_MSG
+	userResp.User = *user
+	ctx.Output.JSON(userResp, true, false)
 }
 
 func IsPhoneExist(ctx *context.Context) {
-
+	phone := ctx.Input.Param(":phone")
+	isUsed, err := models.IsPhoneExist(phone)
+	if nil != err {
+		ctx.Output.JSON(GetBaseErrorResp(444, err.Error()), true, false)
+		return
+	}
+	if isUsed {
+		ctx.Output.JSON(GetBaseErrorResp(conf.ERROR_PHONE_IS_EXIST, conf.ERROR_PHONE_IS_EXIST_MSG), true, false)
+		return
+	}
+	ctx.Output.JSON(GetBaseErrorResp(conf.SUCCESS, conf.SUCCESS_MSG), true, false)
 }
 
 func IsNickNameExist(ctx *context.Context) {
-
-}
-
-func validateSummaryForm(form url.Values) (map[string]string, error) {
-	kv := make(map[string]string)
-
-	return kv, nil
+	nickName := ctx.Input.Param(":nickname")
+	isUsed, err := models.IsNickNameExist(nickName)
+	if nil != err {
+		ctx.Output.JSON(GetBaseErrorResp(444, err.Error()), true, false)
+		return
+	}
+	if isUsed {
+		ctx.Output.JSON(GetBaseErrorResp(conf.ERROR_NICKNAME_EXIST, conf.ERROR_NICKNAME_EXIST_MSG), true, false)
+		return
+	}
+	ctx.Output.JSON(GetBaseErrorResp(conf.SUCCESS, conf.SUCCESS_MSG), true, false)
 }
 
 func uploadFile(file multipart.File, fHead *multipart.FileHeader) (string, error) {

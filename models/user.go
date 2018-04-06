@@ -21,6 +21,7 @@ type User struct {
 	SilverMoney   float32 `json:"silver_money" bson:"silver_money"`   //银笑点
 	Creditibility float32 `json:"creditibility" bson:"creditibility"` //信誉度
 	Sign          string  `json:"sign" bson:"sign"`                   //签名
+	Token         string  `json:"token" bson:"token"`                 //身份认证，需要不定时更新
 }
 
 func (user *User) Save() error {
@@ -43,6 +44,22 @@ func Update(user *User) error {
 	return nil
 }
 
+func Login(phone, pass string) *User {
+	dialInfo := db.CreateDialInfo()
+	session, err := mgo.DialWithInfo(dialInfo)
+	if nil != err {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
+	user := &User{}
+	err = userC.Find(bson.M{conf.USER_PHONE: phone, conf.USER_PASS: pass}).One(user)
+	if nil != err {
+		panic(BaseResp{conf.ERROR_ACCOUNT_NOT_EXIST_OR_PASS_ERROR, conf.ERROR_ACCOUNT_NOT_EXIST_OR_PASS_ERROR_MSG})
+	}
+	return user
+}
 func IsPhoneExist(phone string) (bool, error) {
 	dialInfo := db.CreateDialInfo()
 	session, err := mgo.DialWithInfo(dialInfo)
@@ -93,5 +110,6 @@ func RegisterDefaultUser(phone, decryptPass, nickName, imgPath string) *User {
 	user.SilverMoney = conf.DEFAULt_SLIVER_MONEY
 	user.Phone = phone
 	user.Img = imgPath
+	user.Token = bson.NewObjectId().Hex()
 	return &user
 }
