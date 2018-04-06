@@ -7,19 +7,30 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+type BaseUser struct {
+	ID            string  `json:"_id" bson:"_id"`
+	NickName      string  `json:"nick_name" bson:"nick_name"`         //昵称
+	RealName      string  `json:"real_name" bson:"real_name"`         //真实姓名
+	Phone         string  `json:"phone" bson:"phone"`                 //手机号
+	UserType      int     `json:"user_type" bson:"user_type"`         //0表示普通用户，1表示笑递员
+	Campus        string  `json:"campus" bson:"campus"`               //学生所在学院
+	SchoolID      string  `json:"school_id" bson:"school_id"`         //学号
+	Img           string  `json:"img" bson:"img"`                     //头像
+	Creditibility float32 `json:"creditibility" bson:"creditibility"` //信誉度
+}
 type User struct {
 	ID            string  `json:"_id" bson:"_id"`
 	NickName      string  `json:"nick_name" bson:"nick_name"`         //昵称
 	RealName      string  `json:"real_name" bson:"real_name"`         //真实姓名
 	Phone         string  `json:"phone" bson:"phone"`                 //手机号
-	Pass          string  `json:"pass" bson:"pass"`                   //密码
 	UserType      int     `json:"user_type" bson:"user_type"`         //0表示普通用户，1表示笑递员
 	Campus        string  `json:"campus" bson:"campus"`               //学生所在学院
 	SchoolID      string  `json:"school_id" bson:"school_id"`         //学号
 	Img           string  `json:"img" bson:"img"`                     //头像
+	Creditibility float32 `json:"creditibility" bson:"creditibility"` //信誉度
+	Pass          string  `json:"pass" bson:"pass"`                   //密码
 	GoldMoney     float32 `json:"gold_money" bson:"gold_money"`       //金笑点
 	SilverMoney   float32 `json:"silver_money" bson:"silver_money"`   //银笑点
-	Creditibility float32 `json:"creditibility" bson:"creditibility"` //信誉度
 	Sign          string  `json:"sign" bson:"sign"`                   //签名
 	Token         string  `json:"token" bson:"token"`                 //身份认证，需要不定时更新
 }
@@ -34,11 +45,11 @@ func (user *User) Save() error {
 	session.SetMode(mgo.Monotonic, true)
 
 	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
-	user.ID = bson.NewObjectId().Hex()
 	err = userC.Insert(user)
 	return err
 }
 
+//todo
 func Update(user *User) error {
 
 	return nil
@@ -102,6 +113,7 @@ func IsNickNameExist(nickName string) (bool, error) {
 
 func RegisterDefaultUser(phone, decryptPass, nickName, imgPath string) *User {
 	user := User{}
+	user.ID = bson.NewObjectId().Hex()
 	user.NickName = nickName
 	user.UserType = conf.NORMAL_USER
 	user.Creditibility = 5.0
@@ -112,4 +124,37 @@ func RegisterDefaultUser(phone, decryptPass, nickName, imgPath string) *User {
 	user.Img = imgPath
 	user.Token = bson.NewObjectId().Hex()
 	return &user
+}
+
+func GetUserById(id string) *User {
+	dialInfo := db.CreateDialInfo()
+	session, err := mgo.DialWithInfo(dialInfo)
+	if nil != err {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+
+	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
+	user := &User{}
+	err = userC.Find(bson.M{conf.ID: id}).One(user)
+	if nil != err {
+		panic(BaseResp{conf.ERROR_USER_NOT_EXIST, conf.ERROR_USER_NOT_EXIST_MSG})
+	}
+	return user
+}
+
+func GetBaseUserById(id string) *BaseUser {
+	user := GetUserById(id)
+	return &BaseUser{
+		ID:            user.ID,
+		NickName:      user.NickName,
+		RealName:      user.RealName,
+		Phone:         user.Phone,
+		UserType:      user.UserType,
+		Campus:        user.Campus,
+		SchoolID:      user.SchoolID,
+		Img:           user.Img,
+		Creditibility: user.Creditibility,
+	}
 }

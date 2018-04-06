@@ -38,11 +38,16 @@ func Register(ctx *context.Context) {
 	}
 
 	file, fHead, _ := ctx.Request.FormFile("img")
-	imgPath, _ := uploadFile(file, fHead)
+	imgPath, _ := uploadFile(file, fHead, conf.UPLOAD_IMG_HEAD_FILE_PATH)
 	httpImgPath := conf.IMG_HEAD_HTTP + imgPath
 	decryptPass := encrypt.Base64AesDecrypt(pass)
 	user := models.RegisterDefaultUser(phone, decryptPass, nickName, httpImgPath)
 	user.Save()
+
+	token := &models.UserToken{}
+	token.UserId = user.ID
+	token.Token = user.Token
+	token.Save()
 
 	user.Pass = pass
 	userResp := &models.UserResp{}
@@ -96,7 +101,7 @@ func IsNickNameExist(ctx *context.Context) {
 	ctx.Output.JSON(GetBaseErrorResp(conf.SUCCESS, conf.SUCCESS_MSG), true, false)
 }
 
-func uploadFile(file multipart.File, fHead *multipart.FileHeader) (string, error) {
+func uploadFile(file multipart.File, fHead *multipart.FileHeader, filepath string) (string, error) {
 	defer file.Close()
 	suffix := GetSuffix(fHead.Filename)
 	isValid := isValidSuffix(suffix)
@@ -105,15 +110,15 @@ func uploadFile(file multipart.File, fHead *multipart.FileHeader) (string, error
 	}
 	filename := bson.NewObjectId().Hex() + suffix
 
-	_, err := os.Stat(conf.UPLOAD_IMG_HEAD_FILE_PATH)
+	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
-		err = os.MkdirAll(conf.UPLOAD_IMG_HEAD_FILE_PATH, 0777)
+		err = os.MkdirAll(filepath, 0777)
 		if nil != err {
 			return "", err
 		}
 	}
 
-	saveFilePath := conf.UPLOAD_IMG_HEAD_FILE_PATH + string(os.PathSeparator) + filename
+	saveFilePath := filepath + string(os.PathSeparator) + filename
 	f, err := os.OpenFile(saveFilePath, os.O_WRONLY|os.O_CREATE, 0666)
 	if nil != err {
 		return "", err

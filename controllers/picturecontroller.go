@@ -3,7 +3,6 @@ package controllers
 import (
 	"XiaodiServer/conf"
 	"errors"
-	"fmt"
 	"github.com/astaxie/beego/context"
 	"image"
 	"image/jpeg"
@@ -15,10 +14,18 @@ import (
 )
 
 func GetPicture(ctx *context.Context) {
+	imgType := ctx.Input.Param(":type")
 	filename := ctx.Input.Param(":imgid")
 	currentPath, err := getCurrentPath()
-	filePath := currentPath + conf.UPLOAD_IMG_HEAD_FILE_PATH + string(os.PathSeparator) + filename
-	fmt.Println(filePath)
+	var filePath string
+	if imgType == "0" {
+		filePath = currentPath + conf.UPLOAD_IMG_HEAD_FILE_PATH + string(os.PathSeparator) + filename
+	} else if imgType == "1" {
+		filePath = currentPath + conf.UPLOAD_IMG_REWARD_FILE_PATH + string(os.PathSeparator) + filename
+	} else {
+		ctx.Output.SetStatus(404)
+		return
+	}
 	_, err = os.Stat(filePath)
 	if os.IsNotExist(err) {
 		ctx.Output.SetStatus(404)

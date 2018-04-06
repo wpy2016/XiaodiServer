@@ -2,12 +2,14 @@ package conf
 
 const (
 	//base conf
-	MGO_IP                 = "127.0.0.1"
-	MGO_PORT               = "27017"
-	MGO_LOGIN_USER         = "wpy"
-	MGO_LOGIN_PASS         = "xiaodi"
-	MGO_DB                 = "xiaodi"
-	MGO_DB_USER_COLLECTION = "user"
+	MGO_IP                   = "127.0.0.1"
+	MGO_PORT                 = "27017"
+	MGO_LOGIN_USER           = "wpy"
+	MGO_LOGIN_PASS           = "xiaodi"
+	MGO_DB                   = "xiaodi"
+	MGO_DB_USER_COLLECTION   = "user"
+	MGO_DB_TOKEN_COLLECTION  = "token"
+	MGO_DB_REWARD_COLLECTION = "reward"
 
 	//section conf
 	ID                 = "_id"
@@ -23,4 +25,23 @@ const (
 	USER_SILVER_MONEY  = "silver_money"
 	USER_CREDITIBILITY = "creditibility"
 	USER_SIGN          = "sign"
+
+	THING_TYPE      = "thing_type"
+	THING_THUMBNAIL = "thumbnail"
+	THING_WEIGHT    = "weight"
+
+	REWARD_PUBLISHER       = "publisher"
+	REWARD_STATE           = "state"
+	REWARD_XIAODIAN        = "xiaodian"
+	REWARD_DEADLINE        = "dead_line"
+	REWARD_ORIGIN_LOCATION = "origin_location"
+	REWARD_DST_LOCATION    = "dst_location"
+	REWARD_RECEIVE         = "receiver"
+	REWARD_PULISHER_GRADE  = "publisher_grade"
+	REWARD_RECEIVE_GRADE   = "receive_grade"
+	REWARD_DESCRIBE        = "describe"
+	REWARD_PUBLISH_USER_ID = "user_id"
+
+	TOEKN         = "token"
+	TOKEN_USER_ID = "user_id"
 )

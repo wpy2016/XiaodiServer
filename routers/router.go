@@ -20,6 +20,17 @@ func init() {
 		beego.NSGet("/exist/phone/:phone", controllers.IsPhoneExist),
 	)
 
-	beego.Get("/picture/:imgid", controllers.GetPicture)
+	rewardRouter := beego.NewNamespace("/reward",
+		beego.NSPost("/send", controllers.SendReward),
+		beego.NSGet("/show/:pages", controllers.ShowReward),
+		beego.NSPost("/receive", controllers.ReceiveReward),
+		beego.NSPost("/carry", controllers.CarryReward),
+		beego.NSPost("/delivery", controllers.DeliveryReward),
+		beego.NSPost("/finish", controllers.FinishReward),
+		beego.NSPost("/evaluate", controllers.Evaluate),
+	)
+
+	beego.Get("/picture/:type/:imgid", controllers.GetPicture)
 	beego.AddNamespace(userRouter)
+	beego.AddNamespace(rewardRouter)
 }
