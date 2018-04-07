@@ -35,18 +35,13 @@ type User struct {
 	Token         string  `json:"token" bson:"token"`                 //身份认证，需要不定时更新
 }
 
-func (user *User) Save() error {
-	dialInfo := db.CreateDialInfo()
-	session, err := mgo.DialWithInfo(dialInfo)
-	if err != nil {
-		return err
-	}
+func (user *User) Save() {
+	session,userC := getUserDbCollection()
 	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-
-	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
-	err = userC.Insert(user)
-	return err
+	err := userC.Insert(user)
+	if nil != err {
+		panic(err)
+	}
 }
 
 //todo
@@ -56,31 +51,18 @@ func Update(user *User) error {
 }
 
 func Login(phone, pass string) *User {
-	dialInfo := db.CreateDialInfo()
-	session, err := mgo.DialWithInfo(dialInfo)
-	if nil != err {
-		panic(err)
-	}
+	session,userC := getUserDbCollection()
 	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
 	user := &User{}
-	err = userC.Find(bson.M{conf.USER_PHONE: phone, conf.USER_PASS: pass}).One(user)
+	err := userC.Find(bson.M{conf.USER_PHONE: phone, conf.USER_PASS: pass}).One(user)
 	if nil != err {
 		panic(BaseResp{conf.ERROR_ACCOUNT_NOT_EXIST_OR_PASS_ERROR, conf.ERROR_ACCOUNT_NOT_EXIST_OR_PASS_ERROR_MSG})
 	}
 	return user
 }
 func IsPhoneExist(phone string) (bool, error) {
-	dialInfo := db.CreateDialInfo()
-	session, err := mgo.DialWithInfo(dialInfo)
-	if nil != err {
-		return false, err
-	}
+	session,userC := getUserDbCollection()
 	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-
-	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
 	count, err := userC.Find(bson.M{conf.USER_PHONE: phone}).Count()
 	if nil != err {
 		return false, err
@@ -92,15 +74,8 @@ func IsPhoneExist(phone string) (bool, error) {
 }
 
 func IsNickNameExist(nickName string) (bool, error) {
-	dialInfo := db.CreateDialInfo()
-	session, err := mgo.DialWithInfo(dialInfo)
-	if nil != err {
-		return false, err
-	}
+	session,userC := getUserDbCollection()
 	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-
-	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
 	count, err := userC.Find(bson.M{conf.USER_NICKNAME: nickName}).Count()
 	if nil != err {
 		return false, err
@@ -111,33 +86,11 @@ func IsNickNameExist(nickName string) (bool, error) {
 	return false, nil
 }
 
-func RegisterDefaultUser(phone, decryptPass, nickName, imgPath string) *User {
-	user := User{}
-	user.ID = bson.NewObjectId().Hex()
-	user.NickName = nickName
-	user.UserType = conf.NORMAL_USER
-	user.Creditibility = 5.0
-	user.GoldMoney = 0
-	user.Pass = decryptPass
-	user.SilverMoney = conf.DEFAULt_SLIVER_MONEY
-	user.Phone = phone
-	user.Img = imgPath
-	user.Token = bson.NewObjectId().Hex()
-	return &user
-}
-
 func GetUserById(id string) *User {
-	dialInfo := db.CreateDialInfo()
-	session, err := mgo.DialWithInfo(dialInfo)
-	if nil != err {
-		panic(err)
-	}
+	session ,userC := getUserDbCollection()
 	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-
-	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
 	user := &User{}
-	err = userC.Find(bson.M{conf.ID: id}).One(user)
+	err := userC.Find(bson.M{conf.ID: id}).One(user)
 	if nil != err {
 		panic(BaseResp{conf.ERROR_USER_NOT_EXIST, conf.ERROR_USER_NOT_EXIST_MSG})
 	}
@@ -157,4 +110,31 @@ func GetBaseUserById(id string) *BaseUser {
 		Img:           user.Img,
 		Creditibility: user.Creditibility,
 	}
+}
+
+func getUserDbCollection() (*mgo.Session,*mgo.Collection) {
+	dialInfo := db.CreateDialInfo()
+	session, err := mgo.DialWithInfo(dialInfo)
+	if err != nil {
+		panic(err)
+	}
+	session.SetMode(mgo.Monotonic, true)
+
+	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
+	return session,userC
+}
+
+func RegisterDefaultUser(phone, decryptPass, nickName, imgPath string) *User {
+	user := User{}
+	user.ID = bson.NewObjectId().Hex()
+	user.NickName = nickName
+	user.UserType = conf.NORMAL_USER
+	user.Creditibility = 5.0
+	user.GoldMoney = 0
+	user.Pass = decryptPass
+	user.SilverMoney = conf.DEFAULt_SLIVER_MONEY
+	user.Phone = phone
+	user.Img = imgPath
+	user.Token = bson.NewObjectId().Hex()
+	return &user
 }

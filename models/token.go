@@ -13,32 +13,30 @@ type UserToken struct {
 }
 
 func (token *UserToken) Save() error {
-	dialInfo := db.CreateDialInfo()
-	session, err := mgo.DialWithInfo(dialInfo)
-	if err != nil {
-		return err
-	}
+	session ,tokenC := getTokenDbCollection()
 	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-
-	tokenC := session.DB(conf.MGO_DB).C(conf.MGO_DB_TOKEN_COLLECTION)
-	err = tokenC.Insert(token)
+	err := tokenC.Insert(token)
 	return err
 }
 
 func AssertTokenExist(userId, token string) {
-	dialInfo := db.CreateDialInfo()
-	session, err := mgo.DialWithInfo(dialInfo)
-	if nil != err {
-		panic(err)
-	}
+	session ,tokenC := getTokenDbCollection()
 	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-
-	tokenC := session.DB(conf.MGO_DB).C(conf.MGO_DB_TOKEN_COLLECTION)
 	userToken := &UserToken{}
-	err = tokenC.Find(bson.M{conf.TOKEN_USER_ID: userId, conf.TOEKN: token}).One(userToken)
+	err := tokenC.Find(bson.M{conf.TOKEN_USER_ID: userId, conf.TOEKN: token}).One(userToken)
 	if nil != err {
 		panic(BaseResp{conf.ERROR_NOT_HAVE_TOKEN, conf.ERROR_NOT_HAVE_TOKEN_MSG})
 	}
+}
+
+func getTokenDbCollection() (*mgo.Session,*mgo.Collection) {
+	dialInfo := db.CreateDialInfo()
+	session, err := mgo.DialWithInfo(dialInfo)
+	if nil != err {
+		panic("getTokenDbCollection" + err.Error())
+	}
+	session.SetMode(mgo.Monotonic, true)
+
+	tokenC := session.DB(conf.MGO_DB).C(conf.MGO_DB_TOKEN_COLLECTION)
+	return session,tokenC
 }

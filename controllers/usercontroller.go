@@ -20,7 +20,7 @@ type UserController struct {
 
 func Register(ctx *context.Context) {
 	defer CatchErr(ctx)
-	ctx.Request.ParseMultipartForm(32 << 20)
+	ctx.Request.ParseMultipartForm(1 << 21)
 	phone := ctx.Request.Form.Get(conf.USER_PHONE)
 	pass := ctx.Request.Form.Get(conf.USER_PASS)
 	nickName := ctx.Request.Form.Get(conf.USER_NICKNAME)

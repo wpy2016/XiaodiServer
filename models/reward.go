@@ -4,7 +4,9 @@ import (
 	"XiaodiServer/conf"
 	"XiaodiServer/models/db"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"time"
+	"errors"
 )
 
 type Thing struct {
@@ -27,20 +29,66 @@ type Reward struct {
 	ReceiveGrade   float32   `json:"receive_grade" bson:"receive_grade"`
 	Describe       string    `json:"describe" bson:"describe"`
 	Thing          Thing     `json:"thing" bson:"thing"`
+	CreateTime     time.Time `json:"create_time" bson:"create_time"`
 }
 
 func (reward *Reward) Save() {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	err := rewardC.Insert(reward)
+	if nil != err {
+		panic(err)
+	}
+}
+
+func ShowReward(pages int) []Reward {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	timeNow := time.Now()
+	timeStr := timeNow.Format(conf.TIME_FORMAT)
+	formatTime, _ := time.Parse(conf.TIME_FORMAT, timeStr)
+	var rewards []Reward
+	err := rewardC.Find(bson.M{"dead_line": bson.M{"$gt": formatTime}, "state": conf.REWARD_SEND}).Sort("-create_time").Limit(
+		conf.REWARD_PAGES_ITEM_COUNT).Skip(pages * conf.REWARD_PAGES_ITEM_COUNT).All(&rewards)
+	if nil != err {
+		panic(errors.New("ShowReward" + err.Error()))
+	}
+	return rewards
+}
+
+func CarryReward(rewardId,userId string) {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	user := GetBaseUserById(userId)
+	if conf.NORMAL_USER == user.UserType {
+		panic(BaseResp{conf.REWARD_CARRY_NEED_PERMISSION,conf.REWARD_CARRY_NEED_PERMISSION_MSG})
+	}
+	timeNow := time.Now()
+	timeStr := timeNow.Format(conf.TIME_FORMAT)
+	formatTime, _ := time.Parse(conf.TIME_FORMAT, timeStr)
+	reward := &Reward{}
+	err := rewardC.Find(bson.M{conf.REWARD_DEADLINE: bson.M{"$gt": formatTime},conf.REWARD_STATE: conf.REWARD_SEND,conf.ID:rewardId}).One(reward)
+	if nil != err {
+		panic(BaseResp{conf.REWARD_CAN_NOT_CARRY,conf.REWARD_CAN_NOT_CARRY_MSG})
+	}
+	err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{
+		"$set": bson.M{
+			"state": conf.REWARD_CARRY,
+			"receiver":user,
+		}})
+	if nil != err {
+		panic(BaseResp{444,err.Error()})
+	}
+}
+
+func getRewardDbCollection() (*mgo.Session, *mgo.Collection) {
 	dialInfo := db.CreateDialInfo()
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
 		panic(err)
 	}
-	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 
 	rewardC := session.DB(conf.MGO_DB).C(conf.MGO_DB_REWARD_COLLECTION)
-	err = rewardC.Insert(reward)
-	if nil != err {
-		panic(err)
-	}
+	return session, rewardC
 }

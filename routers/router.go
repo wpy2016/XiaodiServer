@@ -22,8 +22,7 @@ func init() {
 
 	rewardRouter := beego.NewNamespace("/reward",
 		beego.NSPost("/send", controllers.SendReward),
-		beego.NSGet("/show/:pages", controllers.ShowReward),
-		beego.NSPost("/receive", controllers.ReceiveReward),
+		beego.NSPost("/show", controllers.ShowReward),
 		beego.NSPost("/carry", controllers.CarryReward),
 		beego.NSPost("/delivery", controllers.DeliveryReward),
 		beego.NSPost("/finish", controllers.FinishReward),

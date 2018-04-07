@@ -12,7 +12,7 @@ import (
 
 func SendReward(ctx *context.Context) {
 	defer CatchErr(ctx)
-	ctx.Request.ParseMultipartForm(32 << 20)
+	ctx.Request.ParseMultipartForm(1 << 21)
 	fmt.Println(ctx.Request.Form)
 	userId := ctx.Request.Form.Get(conf.REWARD_PUBLISH_USER_ID)
 	token := ctx.Request.Form.Get(conf.TOEKN)
@@ -25,7 +25,7 @@ func SendReward(ctx *context.Context) {
 		panic(models.BaseResp{conf.ERROR_XIAODIAN_LAYOUT, conf.ERROR_XIAODIAN_LAYOUT_MSG})
 	}
 	deadlineStr := ctx.Request.Form.Get(conf.REWARD_DEADLINE)
-	deadlineTime, err := time.Parse("2006-01-02 15:04", deadlineStr)
+	deadlineTime, err := time.Parse(conf.TIME_FORMAT, deadlineStr)
 	if nil != err {
 		panic(models.BaseResp{conf.ERROR_TIME_LAYOUT, conf.ERROR_TIME_LAYOUT_MSG})
 	}
@@ -44,21 +44,38 @@ func SendReward(ctx *context.Context) {
 		DstLocation:    dstLocation,
 		Describe:       descibe,
 		Thing:          thing,
+		CreateTime:     time.Now(),
 	}
 	reward.Save()
 	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
 }
 
 func ShowReward(ctx *context.Context) {
+	defer CatchErr(ctx)
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	token := ctx.Request.Form.Get(conf.TOEKN)
+	models.AssertTokenExist(userId, token)
 
-}
+	pages := ctx.Request.Form.Get(conf.REWARD_PAGES)
+	pagesInt, _ := strconv.Atoi(pages)
+	rewards := models.ShowReward(pagesInt)
+	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
 
-func ReceiveReward(ctx *context.Context) {
-
+	ctx.Output.JSON(rewardResp, true, false)
 }
 
 func CarryReward(ctx *context.Context) {
+	defer CatchErr(ctx)
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	token := ctx.Request.Form.Get(conf.TOEKN)
+	models.AssertTokenExist(userId, token)
 
+	rewardId := ctx.Request.Form.Get(conf.ID)
+	models.CarryReward(rewardId,userId)
+	baseResp := models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}
+	ctx.Output.JSON(baseResp, true, false)
 }
 
 func DeliveryReward(ctx *context.Context) {
