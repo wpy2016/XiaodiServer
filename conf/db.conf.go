@@ -34,6 +34,7 @@ const (
 	REWARD_STATE            = "state"
 	REWARD_XIAODIAN         = "xiaodian"
 	REWARD_DEADLINE         = "dead_line"
+	REWARD_DEADLINE_TIME         = "dead_line_time"
 	REWARD_ORIGIN_LOCATION  = "origin_location"
 	REWARD_DST_LOCATION     = "dst_location"
 	REWARD_RECEIVE          = "receiver"

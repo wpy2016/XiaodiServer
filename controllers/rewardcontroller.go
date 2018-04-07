@@ -39,7 +39,8 @@ func SendReward(ctx *context.Context) {
 		State:          conf.REWARD_SEND,
 		Phone:          phone,
 		Xiaodian:       int(xiaodianInt),
-		DeadLine:       deadlineTime,
+		DeadLine:       deadlineStr,
+		DeadLineTime:   deadlineTime,
 		OriginLocation: originLocation,
 		DstLocation:    dstLocation,
 		Describe:       descibe,
@@ -61,7 +62,6 @@ func ShowReward(ctx *context.Context) {
 	pagesInt, _ := strconv.Atoi(pages)
 	rewards := models.ShowReward(pagesInt)
 	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
-
 	ctx.Output.JSON(rewardResp, true, false)
 }
 
@@ -73,7 +73,7 @@ func CarryReward(ctx *context.Context) {
 	models.AssertTokenExist(userId, token)
 
 	rewardId := ctx.Request.Form.Get(conf.ID)
-	models.CarryReward(rewardId,userId)
+	models.CarryReward(rewardId, userId)
 	baseResp := models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}
 	ctx.Output.JSON(baseResp, true, false)
 }

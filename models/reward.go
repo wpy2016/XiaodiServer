@@ -21,7 +21,8 @@ type Reward struct {
 	State          int       `json:"state" bson:"state"` //-1 表示过期,0表示发布,1表示拿到了物品并代送中,2表示笑递员发起带到，3表示物主完成
 	Phone          string    `json:"phone" bson:"phone"`
 	Xiaodian       int       `json:"xiaodian" bson:"xiaodian"`
-	DeadLine       time.Time `json:"dead_line" bson:"dead_line"`
+	DeadLine       string    `json:"dead_line" bson:"dead_line"`
+	DeadLineTime   time.Time `json:"dead_line_time" bson:"dead_line_time"`
 	OriginLocation string    `json:"origin_location" bson:"origin_location"`
 	DstLocation    string    `json:"dst_location" bson:"dst_location"`
 	Receiver       BaseUser  `json:"receiver" bson:"receiver"`
@@ -48,7 +49,7 @@ func ShowReward(pages int) []Reward {
 	timeStr := timeNow.Format(conf.TIME_FORMAT)
 	formatTime, _ := time.Parse(conf.TIME_FORMAT, timeStr)
 	var rewards []Reward
-	err := rewardC.Find(bson.M{"dead_line": bson.M{"$gt": formatTime}, "state": conf.REWARD_SEND}).Sort("-create_time").Limit(
+	err := rewardC.Find(bson.M{conf.REWARD_DEADLINE_TIME: bson.M{"$gt": formatTime}, "state": conf.REWARD_SEND}).Sort("-create_time").Limit(
 		conf.REWARD_PAGES_ITEM_COUNT).Skip(pages * conf.REWARD_PAGES_ITEM_COUNT).All(&rewards)
 	if nil != err {
 		panic(errors.New("ShowReward" + err.Error()))
@@ -56,28 +57,28 @@ func ShowReward(pages int) []Reward {
 	return rewards
 }
 
-func CarryReward(rewardId,userId string) {
+func CarryReward(rewardId, userId string) {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
 	user := GetBaseUserById(userId)
 	if conf.NORMAL_USER == user.UserType {
-		panic(BaseResp{conf.REWARD_CARRY_NEED_PERMISSION,conf.REWARD_CARRY_NEED_PERMISSION_MSG})
+		panic(BaseResp{conf.REWARD_CARRY_NEED_PERMISSION, conf.REWARD_CARRY_NEED_PERMISSION_MSG})
 	}
 	timeNow := time.Now()
 	timeStr := timeNow.Format(conf.TIME_FORMAT)
 	formatTime, _ := time.Parse(conf.TIME_FORMAT, timeStr)
 	reward := &Reward{}
-	err := rewardC.Find(bson.M{conf.REWARD_DEADLINE: bson.M{"$gt": formatTime},conf.REWARD_STATE: conf.REWARD_SEND,conf.ID:rewardId}).One(reward)
+	err := rewardC.Find(bson.M{conf.REWARD_DEADLINE_TIME: bson.M{"$gt": formatTime}, conf.REWARD_STATE: conf.REWARD_SEND, conf.ID: rewardId}).One(reward)
 	if nil != err {
-		panic(BaseResp{conf.REWARD_CAN_NOT_CARRY,conf.REWARD_CAN_NOT_CARRY_MSG})
+		panic(BaseResp{conf.REWARD_CAN_NOT_CARRY, conf.REWARD_CAN_NOT_CARRY_MSG})
 	}
 	err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{
 		"$set": bson.M{
-			"state": conf.REWARD_CARRY,
-			"receiver":user,
+			"state":    conf.REWARD_CARRY,
+			"receiver": user,
 		}})
 	if nil != err {
-		panic(BaseResp{444,err.Error()})
+		panic(BaseResp{444, err.Error()})
 	}
 }
 
