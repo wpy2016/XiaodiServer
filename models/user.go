@@ -45,7 +45,7 @@ func (user *User) Save() {
 }
 
 //todo
-func Update(user *User) error {
+func UpdateUser(user *User) error {
 
 	return nil
 }

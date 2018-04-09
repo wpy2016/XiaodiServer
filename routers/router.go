@@ -31,6 +31,8 @@ func init() {
 		beego.NSPost("/delivery", controllers.AssertToken(controllers.DeliveryReward)),
 		beego.NSPost("/finish", controllers.AssertToken(controllers.FinishReward)),
 		beego.NSPost("/evaluate", controllers.AssertToken(controllers.Evaluate)),
+		beego.NSPost("/delete", controllers.AssertToken(controllers.DeleteReward)),
+		beego.NSPost("/update", controllers.AssertToken(controllers.UpdateReward)),
 	)
 
 	beego.Get("/picture/:type/:imgid", controllers.GetPicture)

@@ -46,6 +46,7 @@ const (
 	REWARD_PAGES            = "pages"
 	REWARD_PAGES_ITEM_COUNT = 10
 	KEYWORD                 = "keyword"
+	REWARD_ID               = "reward_id"
 
 	TIME_FORMAT        = "2006-01-02 15:04"
 	RETURN_TIME_FORMAT = "01-02 15:04"

@@ -46,6 +46,46 @@ func SendReward(ctx *context.Context) {
 	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
 }
 
+func UpdateReward(ctx *context.Context) {
+	ctx.Request.ParseMultipartForm(1 << 21)
+	rewardId := ctx.Request.Form.Get(conf.REWARD_ID)
+	userId := ctx.Request.Form.Get(conf.REWARD_PUBLISH_USER_ID)
+	baseUser := models.GetBaseUserById(userId)
+	phone := ctx.Request.Form.Get(conf.USER_PHONE)
+	xiaodian := ctx.Request.Form.Get(conf.REWARD_XIAODIAN)
+	xiaodianInt, err := strconv.ParseInt(xiaodian, 10, 32)
+	if nil != err {
+		panic(models.BaseResp{conf.ERROR_XIAODIAN_LAYOUT, conf.ERROR_XIAODIAN_LAYOUT_MSG})
+	}
+	deadlineStr := ctx.Request.Form.Get(conf.REWARD_DEADLINE)
+	deadlineTime, err := time.Parse(conf.TIME_FORMAT, deadlineStr)
+	if nil != err {
+		panic(models.BaseResp{conf.ERROR_TIME_LAYOUT, conf.ERROR_TIME_LAYOUT_MSG})
+	}
+	originLocation := ctx.Request.Form.Get(conf.REWARD_ORIGIN_LOCATION)
+	dstLocation := ctx.Request.Form.Get(conf.REWARD_DST_LOCATION)
+	descibe := ctx.Request.Form.Get(conf.REWARD_DESCRIBE)
+
+	thing := getThing(ctx)
+
+	newReward := &models.Reward{
+		ID:             rewardId,
+		Publisher:      *baseUser,
+		State:          conf.REWARD_SEND,
+		Phone:          phone,
+		Xiaodian:       int(xiaodianInt),
+		DeadLine:       deadlineStr,
+		DeadLineTime:   deadlineTime,
+		OriginLocation: originLocation,
+		DstLocation:    dstLocation,
+		Describe:       descibe,
+		Thing:          thing,
+		CreateTime:     time.Now(),
+	}
+	models.UpdateReward(rewardId, userId, *newReward)
+	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
+}
+
 func ShowRewardMySend(ctx *context.Context) {
 	ctx.Request.ParseForm()
 	userId := ctx.Request.Form.Get(conf.REWARD_PUBLISH_USER_ID)
@@ -71,6 +111,14 @@ func ShowReward(ctx *context.Context) {
 	ctx.Output.JSON(rewardResp, true, false)
 }
 
+func DeleteReward(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.REWARD_PUBLISH_USER_ID)
+	rewardId := ctx.Request.Form.Get(conf.REWARD_ID)
+	models.DeleteReward(rewardId, userId)
+	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
+}
+
 func ShowRewardSortXiaodian(ctx *context.Context) {
 	ctx.Request.ParseForm()
 	pages := ctx.Request.Form.Get(conf.REWARD_PAGES)
@@ -85,7 +133,7 @@ func ShowRewardKeyword(ctx *context.Context) {
 	pages := ctx.Request.Form.Get(conf.REWARD_PAGES)
 	keyword := ctx.Request.Form.Get(conf.KEYWORD)
 	pagesInt, _ := strconv.Atoi(pages)
-	rewards := models.ShowRewardKeyword(pagesInt,keyword)
+	rewards := models.ShowRewardKeyword(pagesInt, keyword)
 	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
 	ctx.Output.JSON(rewardResp, true, false)
 }
@@ -117,7 +165,7 @@ func getThing(ctx *context.Context) models.Thing {
 	if nil != err {
 		panic(models.BaseResp{conf.ERROR_THING_TYPE, conf.ERROR_THING_TYPE_MSG})
 	}
-	var thumbnail string
+	thumbnail := ""
 	file, header, e := ctx.Request.FormFile(conf.THING_THUMBNAIL)
 	if nil != e {
 		switch thingTypeInt {

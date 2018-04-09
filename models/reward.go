@@ -42,6 +42,26 @@ func (reward *Reward) Save() {
 	}
 }
 
+func UpdateReward(rewardId,userId string,newReward Reward) {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	var oldReward Reward
+	err := rewardC.Find(bson.M{conf.ID:rewardId}).One(&oldReward)
+	if nil != err {
+		panic(BaseResp{StatusCode:conf.REWARD_NOT_EXIST,StatusMsg:conf.REWARD_NOT_EXIST_MSG})
+	}
+	if userId != oldReward.Publisher.ID {
+		panic(BaseResp{StatusCode:conf.NOT_OWNER_REWARD_CAN_NOT_UPDATE,StatusMsg:conf.NOT_OWNER_REWARD_CAN_NOT_UPDATE_MSG})
+	}
+	if conf.REWARD_SEND != oldReward.State {
+		panic(BaseResp{StatusCode:conf.NOT_SEND_REWARD_CAN_NOT_UPDATE,StatusMsg:conf.NOT_SEND_REWARD_CAN_NOT_UPDATE_MSG})
+	}
+	err = rewardC.Update(bson.M{conf.ID: oldReward.ID}, newReward)
+	if nil != err {
+		panic(err)
+	}
+}
+
 func ShowReward(pages int) []Reward {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
@@ -55,6 +75,26 @@ func ShowReward(pages int) []Reward {
 		panic(errors.New("ShowReward" + err.Error()))
 	}
 	return rewards
+}
+
+func DeleteReward(id,userId string) {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	var reward Reward
+	err := rewardC.Find(bson.M{conf.ID:id}).One(&reward)
+	if nil != err {
+		panic(BaseResp{StatusCode:conf.REWARD_NOT_EXIST,StatusMsg:conf.REWARD_NOT_EXIST_MSG})
+	}
+	if userId != reward.Publisher.ID {
+		panic(BaseResp{StatusCode:conf.NOT_OWNER_REWARD_CAN_NOT_DELETE,StatusMsg:conf.NOT_OWNER_REWARD_CAN_NOT_DELETE_MSG})
+	}
+	if conf.REWARD_SEND != reward.State {
+		panic(BaseResp{StatusCode:conf.NOT_SEND_REWARD_CAN_NOT_DELETE,StatusMsg:conf.NOT_SEND_REWARD_CAN_NOT_DELETE_MSG})
+	}
+	err = rewardC.Remove(bson.M{conf.ID:id})
+	if nil != err {
+		panic(err)
+	}
 }
 
 func ShowRewardMySend(userId string) []Reward {
