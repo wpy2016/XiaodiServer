@@ -57,6 +57,28 @@ func ShowReward(pages int) []Reward {
 	return rewards
 }
 
+func ShowRewardMySend(userId string) []Reward {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	var rewards []Reward
+	err := rewardC.Find(bson.M{"publisher._id":userId}).Sort("-create_time").All(&rewards)
+	if nil != err {
+		panic(errors.New("ShowRewardMySend" + err.Error()))
+	}
+	return rewards
+}
+
+func ShowRewardMyCarry(userId string) []Reward {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	var rewards []Reward
+	err := rewardC.Find(bson.M{"receiver._id":userId}).Sort("-create_time").All(&rewards)
+	if nil != err {
+		panic(errors.New("ShowRewardMyCarry" + err.Error()))
+	}
+	return rewards
+}
+
 func ShowRewardSortXiaodian(pages int) []Reward {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
@@ -66,13 +88,13 @@ func ShowRewardSortXiaodian(pages int) []Reward {
 	var rewards []Reward
 	err := rewardC.Find(bson.M{conf.REWARD_DEADLINE_TIME: bson.M{"$gt": formatTime}, "state": conf.REWARD_SEND}).Sort("-xiaodian").Limit(
 		conf.REWARD_PAGES_ITEM_COUNT).Skip(pages * conf.REWARD_PAGES_ITEM_COUNT).All(&rewards)
-	 if nil != err {
+	if nil != err {
 		panic(errors.New("ShowReward" + err.Error()))
 	}
 	return rewards
 }
 
-func ShowRewardKeyword(pages int,key string) []Reward {
+func ShowRewardKeyword(pages int, key string) []Reward {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
 	timeNow := time.Now()
@@ -81,9 +103,9 @@ func ShowRewardKeyword(pages int,key string) []Reward {
 	var rewards []Reward
 	err := rewardC.Find(bson.M{
 		conf.REWARD_DEADLINE_TIME: bson.M{"$gt": formatTime},
-	    "state": conf.REWARD_SEND,
-	//	"$text":bson.M{"$search":key},
-	    }).Sort("-xiaodian").Limit(
+		"state":                   conf.REWARD_SEND,
+		//	"$text":bson.M{"$search":key},
+	}).Sort("-xiaodian").Limit(
 		conf.REWARD_PAGES_ITEM_COUNT).Skip(pages * conf.REWARD_PAGES_ITEM_COUNT).All(&rewards)
 	if nil != err {
 		panic(errors.New("ShowReward" + err.Error()))

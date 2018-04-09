@@ -4,6 +4,8 @@ import (
 	"XiaodiServer/models"
 	"fmt"
 	"github.com/astaxie/beego/context"
+	"github.com/astaxie/beego"
+	"XiaodiServer/conf"
 )
 
 func GetBaseErrorResp(code int, msg string) models.BaseResp {
@@ -27,6 +29,19 @@ func CatchErr(ctx *context.Context) {
 				StatusMsg:  errStr,
 			}
 			ctx.Output.JSON(errNew, true, false)
+		}
+	}
+}
+
+func AssertToken(f beego.FilterFunc) beego.FilterFunc {
+	return func (ctx *context.Context) {
+		defer CatchErr(ctx)
+		ctx.Request.ParseForm()
+		userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+		token := ctx.Request.Form.Get(conf.TOEKN)
+		models.AssertTokenExist(userId, token)
+		if nil != f{
+			f(ctx)
 		}
 	}
 }

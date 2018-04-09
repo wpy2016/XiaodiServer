@@ -3,7 +3,6 @@ package controllers
 import (
 	"XiaodiServer/conf"
 	"XiaodiServer/models"
-	"fmt"
 	"github.com/astaxie/beego/context"
 	"gopkg.in/mgo.v2/bson"
 	"strconv"
@@ -11,12 +10,8 @@ import (
 )
 
 func SendReward(ctx *context.Context) {
-	defer CatchErr(ctx)
 	ctx.Request.ParseMultipartForm(1 << 21)
-	fmt.Println(ctx.Request.Form)
 	userId := ctx.Request.Form.Get(conf.REWARD_PUBLISH_USER_ID)
-	token := ctx.Request.Form.Get(conf.TOEKN)
-	models.AssertTokenExist(userId, token)
 	baseUser := models.GetBaseUserById(userId)
 	phone := ctx.Request.Form.Get(conf.USER_PHONE)
 	xiaodian := ctx.Request.Form.Get(conf.REWARD_XIAODIAN)
@@ -51,13 +46,24 @@ func SendReward(ctx *context.Context) {
 	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
 }
 
-func ShowReward(ctx *context.Context) {
-	defer CatchErr(ctx)
+func ShowRewardMySend(ctx *context.Context) {
 	ctx.Request.ParseForm()
-	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
-	token := ctx.Request.Form.Get(conf.TOEKN)
-	models.AssertTokenExist(userId, token)
+	userId := ctx.Request.Form.Get(conf.REWARD_PUBLISH_USER_ID)
+	rewards := models.ShowRewardMySend(userId)
+	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
+	ctx.Output.JSON(rewardResp, true, false)
+}
 
+func ShowRewardMyCarry(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.REWARD_RECEIVER_USER_ID)
+	rewards := models.ShowRewardMyCarry(userId)
+	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
+	ctx.Output.JSON(rewardResp, true, false)
+}
+
+func ShowReward(ctx *context.Context) {
+	ctx.Request.ParseForm()
 	pages := ctx.Request.Form.Get(conf.REWARD_PAGES)
 	pagesInt, _ := strconv.Atoi(pages)
 	rewards := models.ShowReward(pagesInt)
@@ -66,12 +72,7 @@ func ShowReward(ctx *context.Context) {
 }
 
 func ShowRewardSortXiaodian(ctx *context.Context) {
-	defer CatchErr(ctx)
 	ctx.Request.ParseForm()
-	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
-	token := ctx.Request.Form.Get(conf.TOEKN)
-	models.AssertTokenExist(userId, token)
-
 	pages := ctx.Request.Form.Get(conf.REWARD_PAGES)
 	pagesInt, _ := strconv.Atoi(pages)
 	rewards := models.ShowRewardSortXiaodian(pagesInt)
@@ -80,12 +81,7 @@ func ShowRewardSortXiaodian(ctx *context.Context) {
 }
 
 func ShowRewardKeyword(ctx *context.Context) {
-	defer CatchErr(ctx)
 	ctx.Request.ParseForm()
-	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
-	token := ctx.Request.Form.Get(conf.TOEKN)
-	models.AssertTokenExist(userId, token)
-
 	pages := ctx.Request.Form.Get(conf.REWARD_PAGES)
 	keyword := ctx.Request.Form.Get(conf.KEYWORD)
 	pagesInt, _ := strconv.Atoi(pages)
@@ -95,12 +91,8 @@ func ShowRewardKeyword(ctx *context.Context) {
 }
 
 func CarryReward(ctx *context.Context) {
-	defer CatchErr(ctx)
 	ctx.Request.ParseForm()
 	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
-	token := ctx.Request.Form.Get(conf.TOEKN)
-	models.AssertTokenExist(userId, token)
-
 	rewardId := ctx.Request.Form.Get(conf.ID)
 	models.CarryReward(rewardId, userId)
 	baseResp := models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}

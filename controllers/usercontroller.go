@@ -74,6 +74,7 @@ func Login(ctx *context.Context) {
 }
 
 func IsPhoneExist(ctx *context.Context) {
+	defer CatchErr(ctx)
 	phone := ctx.Input.Param(":phone")
 	isUsed, err := models.IsPhoneExist(phone)
 	if nil != err {
@@ -88,6 +89,7 @@ func IsPhoneExist(ctx *context.Context) {
 }
 
 func IsNickNameExist(ctx *context.Context) {
+	defer CatchErr(ctx)
 	nickName := ctx.Input.Param(":nickname")
 	isUsed, err := models.IsNickNameExist(nickName)
 	if nil != err {

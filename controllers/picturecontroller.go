@@ -14,6 +14,7 @@ import (
 )
 
 func GetPicture(ctx *context.Context) {
+	defer CatchErr(ctx)
 	imgType := ctx.Input.Param(":type")
 	filename := ctx.Input.Param(":imgid")
 	currentPath, err := getCurrentPath()

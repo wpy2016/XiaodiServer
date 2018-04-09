@@ -21,14 +21,16 @@ func init() {
 	)
 
 	rewardRouter := beego.NewNamespace("/reward",
-		beego.NSPost("/send", controllers.SendReward),
-		beego.NSPost("/show", controllers.ShowReward),
-		beego.NSPost("/show/xiaodian", controllers.ShowRewardSortXiaodian),
-		beego.NSPost("/show/keyword", controllers.ShowRewardKeyword),
-		beego.NSPost("/carry", controllers.CarryReward),
-		beego.NSPost("/delivery", controllers.DeliveryReward),
-		beego.NSPost("/finish", controllers.FinishReward),
-		beego.NSPost("/evaluate", controllers.Evaluate),
+		beego.NSPost("/send", controllers.AssertToken(controllers.SendReward)),
+		beego.NSPost("/show", controllers.AssertToken(controllers.ShowReward)),
+		beego.NSPost("/show/my/send", controllers.AssertToken(controllers.ShowRewardMySend)),
+		beego.NSPost("/show/my/carry", controllers.AssertToken(controllers.ShowRewardMyCarry)),
+		beego.NSPost("/show/xiaodian", controllers.AssertToken(controllers.ShowRewardSortXiaodian)),
+		beego.NSPost("/show/keyword", controllers.AssertToken(controllers.ShowRewardKeyword)),
+		beego.NSPost("/carry", controllers.AssertToken(controllers.CarryReward)),
+		beego.NSPost("/delivery", controllers.AssertToken(controllers.DeliveryReward)),
+		beego.NSPost("/finish", controllers.AssertToken(controllers.FinishReward)),
+		beego.NSPost("/evaluate", controllers.AssertToken(controllers.Evaluate)),
 	)
 
 	beego.Get("/picture/:type/:imgid", controllers.GetPicture)
