@@ -60,6 +60,29 @@ func Login(phone, pass string) *User {
 	}
 	return user
 }
+
+func Auth(userId,realName,schoolId,campus string) {
+	session,userC := getUserDbCollection()
+	defer session.Close()
+	user := &User{}
+	err := userC.Find(bson.M{conf.ID: userId}).One(user)
+	if nil != err {
+		panic(BaseResp{StatusCode:conf.ERROR_USER_NOT_EXIST,StatusMsg:conf.ERROR_USER_NOT_EXIST_MSG})
+	}
+	if conf.XIAODI_YUAN == user.UserType {
+		panic(BaseResp{StatusCode:conf.ERROR_USER_ALREADY_AUTH,StatusMsg:conf.ERROR_USER_ALREADY_AUTH_MSG})
+	}
+	user.UserType = conf.XIAODI_YUAN
+	user.Campus = campus
+	user.RealName = realName
+	user.SchoolID = schoolId
+	err = userC.Update(bson.M{conf.ID: userId},user)
+	if nil != err {
+		panic(err)
+	}
+}
+
+
 func IsPhoneExist(phone string) (bool, error) {
 	session,userC := getUserDbCollection()
 	defer session.Close()

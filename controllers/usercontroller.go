@@ -73,6 +73,38 @@ func Login(ctx *context.Context) {
 	ctx.Output.JSON(userResp, true, false)
 }
 
+func GetUser(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	user := models.GetUserById(userId)
+	user.Pass = ""
+	userResp := &models.UserResp{}
+	userResp.StatusCode = conf.SUCCESS
+	userResp.StatusMsg = conf.SUCCESS_MSG
+	userResp.User = *user
+	ctx.Output.JSON(userResp, true, false)
+}
+
+func Auth(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	schoolId := ctx.Request.Form.Get(conf.USER_SCHOOL_ID)
+	schoolPass := ctx.Request.Form.Get(conf.USER_SCHOOL_PASS)
+	realName := ctx.Request.Form.Get(conf.USER_REALNAME)
+
+	decryptSchoolPass := encrypt.Base64AesDecrypt(schoolPass)
+	//todo 开发学校认证，成功后，替换下面的  //realName,campus := getInfoFormSchool(schoolId,decryptSchoolPass)
+	_,campus := getInfoFormSchool(schoolId,decryptSchoolPass)
+
+	models.Auth(userId,realName,schoolId,campus)
+
+	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
+}
+func getInfoFormSchool(schoolId,schoolPass string) (string,string) {
+
+	return "","大数据与软件学院"
+}
+
 func IsPhoneExist(ctx *context.Context) {
 	defer CatchErr(ctx)
 	phone := ctx.Input.Param(":phone")

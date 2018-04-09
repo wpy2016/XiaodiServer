@@ -25,6 +25,7 @@ const (
 	USER_SILVER_MONEY  = "silver_money"
 	USER_CREDITIBILITY = "creditibility"
 	USER_SIGN          = "sign"
+	USER_SCHOOL_PASS   = "school_pass"
 
 	THING_TYPE      = "thing_type"
 	THING_THUMBNAIL = "thumbnail"
