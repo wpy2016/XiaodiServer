@@ -34,7 +34,7 @@ const (
 	REWARD_STATE            = "state"
 	REWARD_XIAODIAN         = "xiaodian"
 	REWARD_DEADLINE         = "dead_line"
-	REWARD_DEADLINE_TIME         = "dead_line_time"
+	REWARD_DEADLINE_TIME    = "dead_line_time"
 	REWARD_ORIGIN_LOCATION  = "origin_location"
 	REWARD_DST_LOCATION     = "dst_location"
 	REWARD_RECEIVE          = "receiver"
@@ -44,8 +44,9 @@ const (
 	REWARD_PUBLISH_USER_ID  = "user_id"
 	REWARD_PAGES            = "pages"
 	REWARD_PAGES_ITEM_COUNT = 10
+	KEYWORD                 = "keyword"
 
-	TIME_FORMAT = "2006-01-02 15:04"
+	TIME_FORMAT        = "2006-01-02 15:04"
 	RETURN_TIME_FORMAT = "01-02 15:04"
 
 	TOEKN         = "token"

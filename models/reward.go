@@ -57,6 +57,40 @@ func ShowReward(pages int) []Reward {
 	return rewards
 }
 
+func ShowRewardSortXiaodian(pages int) []Reward {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	timeNow := time.Now()
+	timeStr := timeNow.Format(conf.TIME_FORMAT)
+	formatTime, _ := time.Parse(conf.TIME_FORMAT, timeStr)
+	var rewards []Reward
+	err := rewardC.Find(bson.M{conf.REWARD_DEADLINE_TIME: bson.M{"$gt": formatTime}, "state": conf.REWARD_SEND}).Sort("-xiaodian").Limit(
+		conf.REWARD_PAGES_ITEM_COUNT).Skip(pages * conf.REWARD_PAGES_ITEM_COUNT).All(&rewards)
+	 if nil != err {
+		panic(errors.New("ShowReward" + err.Error()))
+	}
+	return rewards
+}
+
+func ShowRewardKeyword(pages int,key string) []Reward {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	timeNow := time.Now()
+	timeStr := timeNow.Format(conf.TIME_FORMAT)
+	formatTime, _ := time.Parse(conf.TIME_FORMAT, timeStr)
+	var rewards []Reward
+	err := rewardC.Find(bson.M{
+		conf.REWARD_DEADLINE_TIME: bson.M{"$gt": formatTime},
+	    "state": conf.REWARD_SEND,
+	//	"$text":bson.M{"$search":key},
+	    }).Sort("-xiaodian").Limit(
+		conf.REWARD_PAGES_ITEM_COUNT).Skip(pages * conf.REWARD_PAGES_ITEM_COUNT).All(&rewards)
+	if nil != err {
+		panic(errors.New("ShowReward" + err.Error()))
+	}
+	return rewards
+}
+
 func CarryReward(rewardId, userId string) {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()

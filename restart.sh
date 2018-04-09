@@ -9,4 +9,4 @@ mv XiaodiServer.tar.gz XiaodiTest/
 cd XiaodiTest/
 tar -zxvf XiaodiServer.tar.gz
 kill -9 $(lsof -i | grep 1688 | awk '{print $2}')
-nohup ./XiaodiServer &
+nohup ./XiaodiServer & > xiaodi.log

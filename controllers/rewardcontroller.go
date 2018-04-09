@@ -65,6 +65,35 @@ func ShowReward(ctx *context.Context) {
 	ctx.Output.JSON(rewardResp, true, false)
 }
 
+func ShowRewardSortXiaodian(ctx *context.Context) {
+	defer CatchErr(ctx)
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	token := ctx.Request.Form.Get(conf.TOEKN)
+	models.AssertTokenExist(userId, token)
+
+	pages := ctx.Request.Form.Get(conf.REWARD_PAGES)
+	pagesInt, _ := strconv.Atoi(pages)
+	rewards := models.ShowRewardSortXiaodian(pagesInt)
+	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
+	ctx.Output.JSON(rewardResp, true, false)
+}
+
+func ShowRewardKeyword(ctx *context.Context) {
+	defer CatchErr(ctx)
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	token := ctx.Request.Form.Get(conf.TOEKN)
+	models.AssertTokenExist(userId, token)
+
+	pages := ctx.Request.Form.Get(conf.REWARD_PAGES)
+	keyword := ctx.Request.Form.Get(conf.KEYWORD)
+	pagesInt, _ := strconv.Atoi(pages)
+	rewards := models.ShowRewardKeyword(pagesInt,keyword)
+	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
+	ctx.Output.JSON(rewardResp, true, false)
+}
+
 func CarryReward(ctx *context.Context) {
 	defer CatchErr(ctx)
 	ctx.Request.ParseForm()
