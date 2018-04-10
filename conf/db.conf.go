@@ -44,6 +44,8 @@ const (
 	REWARD_DESCRIBE         = "describe"
 	REWARD_PUBLISH_USER_ID  = "user_id"
 	REWARD_RECEIVER_USER_ID = "user_id"
+
+	RECEIVE_ID              = "receive_id"
 	REWARD_PAGES            = "pages"
 	REWARD_PAGES_ITEM_COUNT = 10
 	KEYWORD                 = "keyword"

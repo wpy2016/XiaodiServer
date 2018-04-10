@@ -78,11 +78,27 @@ func Login(ctx *context.Context) {
 	ctx.Output.JSON(userResp, true, false)
 }
 
-func GetUser(ctx *context.Context) {
+func GetMyInfo(ctx *context.Context) {
 	ctx.Request.ParseForm()
 	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
 	user := models.GetUserById(userId)
 	user.Pass = ""
+	userResp := &models.UserResp{}
+	userResp.StatusCode = conf.SUCCESS
+	userResp.StatusMsg = conf.SUCCESS_MSG
+	userResp.User = *user
+	ctx.Output.JSON(userResp, true, false)
+}
+
+func GetUserInfo(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	id := ctx.Request.Form.Get(conf.ID)
+	user := models.GetUserById(id)
+	user.Pass = ""
+	user.SilverMoney = 0
+	user.GoldMoney = 0
+	user.Token = ""
+	user.RongyunToken = ""
 	userResp := &models.UserResp{}
 	userResp.StatusCode = conf.SUCCESS
 	userResp.StatusMsg = conf.SUCCESS_MSG

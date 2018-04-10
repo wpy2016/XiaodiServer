@@ -94,6 +94,20 @@ func ShowRewardMySend(ctx *context.Context) {
 	ctx.Output.JSON(rewardResp, true, false)
 }
 
+/**
+userid 发布的
+receiveId 领取的
+ */
+func ShowRewardOurNotFinish(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.REWARD_PUBLISH_USER_ID)
+	receiveId := ctx.Request.Form.Get(conf.RECEIVE_ID)
+	rewards := models.ShowRewardOurNotFinish(userId,receiveId)
+	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
+	ctx.Output.JSON(rewardResp, true, false)
+}
+
+
 func ShowRewardMyCarry(ctx *context.Context) {
 	ctx.Request.ParseForm()
 	userId := ctx.Request.Form.Get(conf.REWARD_RECEIVER_USER_ID)

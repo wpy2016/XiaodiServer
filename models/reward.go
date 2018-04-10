@@ -42,19 +42,19 @@ func (reward *Reward) Save() {
 	}
 }
 
-func UpdateReward(rewardId,userId string,newReward Reward) {
+func UpdateReward(rewardId, userId string, newReward Reward) {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
 	var oldReward Reward
-	err := rewardC.Find(bson.M{conf.ID:rewardId}).One(&oldReward)
+	err := rewardC.Find(bson.M{conf.ID: rewardId}).One(&oldReward)
 	if nil != err {
-		panic(BaseResp{StatusCode:conf.REWARD_NOT_EXIST,StatusMsg:conf.REWARD_NOT_EXIST_MSG})
+		panic(BaseResp{StatusCode: conf.REWARD_NOT_EXIST, StatusMsg: conf.REWARD_NOT_EXIST_MSG})
 	}
 	if userId != oldReward.Publisher.ID {
-		panic(BaseResp{StatusCode:conf.NOT_OWNER_REWARD_CAN_NOT_UPDATE,StatusMsg:conf.NOT_OWNER_REWARD_CAN_NOT_UPDATE_MSG})
+		panic(BaseResp{StatusCode: conf.NOT_OWNER_REWARD_CAN_NOT_UPDATE, StatusMsg: conf.NOT_OWNER_REWARD_CAN_NOT_UPDATE_MSG})
 	}
 	if conf.REWARD_SEND != oldReward.State {
-		panic(BaseResp{StatusCode:conf.NOT_SEND_REWARD_CAN_NOT_UPDATE,StatusMsg:conf.NOT_SEND_REWARD_CAN_NOT_UPDATE_MSG})
+		panic(BaseResp{StatusCode: conf.NOT_SEND_REWARD_CAN_NOT_UPDATE, StatusMsg: conf.NOT_SEND_REWARD_CAN_NOT_UPDATE_MSG})
 	}
 	err = rewardC.Update(bson.M{conf.ID: oldReward.ID}, newReward)
 	if nil != err {
@@ -77,21 +77,21 @@ func ShowReward(pages int) []Reward {
 	return rewards
 }
 
-func DeleteReward(id,userId string) {
+func DeleteReward(id, userId string) {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
 	var reward Reward
-	err := rewardC.Find(bson.M{conf.ID:id}).One(&reward)
+	err := rewardC.Find(bson.M{conf.ID: id}).One(&reward)
 	if nil != err {
-		panic(BaseResp{StatusCode:conf.REWARD_NOT_EXIST,StatusMsg:conf.REWARD_NOT_EXIST_MSG})
+		panic(BaseResp{StatusCode: conf.REWARD_NOT_EXIST, StatusMsg: conf.REWARD_NOT_EXIST_MSG})
 	}
 	if userId != reward.Publisher.ID {
-		panic(BaseResp{StatusCode:conf.NOT_OWNER_REWARD_CAN_NOT_DELETE,StatusMsg:conf.NOT_OWNER_REWARD_CAN_NOT_DELETE_MSG})
+		panic(BaseResp{StatusCode: conf.NOT_OWNER_REWARD_CAN_NOT_DELETE, StatusMsg: conf.NOT_OWNER_REWARD_CAN_NOT_DELETE_MSG})
 	}
 	if conf.REWARD_SEND != reward.State {
-		panic(BaseResp{StatusCode:conf.NOT_SEND_REWARD_CAN_NOT_DELETE,StatusMsg:conf.NOT_SEND_REWARD_CAN_NOT_DELETE_MSG})
+		panic(BaseResp{StatusCode: conf.NOT_SEND_REWARD_CAN_NOT_DELETE, StatusMsg: conf.NOT_SEND_REWARD_CAN_NOT_DELETE_MSG})
 	}
-	err = rewardC.Remove(bson.M{conf.ID:id})
+	err = rewardC.Remove(bson.M{conf.ID: id})
 	if nil != err {
 		panic(err)
 	}
@@ -101,10 +101,30 @@ func ShowRewardMySend(userId string) []Reward {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
 	var rewards []Reward
-	err := rewardC.Find(bson.M{"publisher._id":userId}).Sort("-create_time").All(&rewards)
+	err := rewardC.Find(bson.M{"publisher._id": userId}).Sort("-create_time").All(&rewards)
 	if nil != err {
 		panic(errors.New("ShowRewardMySend" + err.Error()))
 	}
+	return rewards
+}
+
+func ShowRewardOurNotFinish(userId, receiveId string) []Reward {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	var rewardmySend []Reward
+	err := rewardC.Find(bson.M{"publisher._id": userId, "receiver._id": receiveId,"state":bson.M{"$ne":conf.REWARD_FINISH}}).Sort("-create_time").All(&rewardmySend)
+	if nil != err {
+		panic(errors.New("ShowRewardOur" + err.Error()))
+	}
+	var rewardmyCarry []Reward
+	err = rewardC.Find(bson.M{"publisher._id": receiveId, "receiver._id": userId,"state":bson.M{"$ne":conf.REWARD_FINISH}}).Sort("-create_time").All(&rewardmyCarry)
+	if nil != err {
+		panic(errors.New("ShowRewardOur" + err.Error()))
+	}
+
+	var rewards []Reward
+	rewards = append(rewards,rewardmySend...)
+	rewards = append(rewards,rewardmyCarry...)
 	return rewards
 }
 
@@ -112,7 +132,7 @@ func ShowRewardMyCarry(userId string) []Reward {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
 	var rewards []Reward
-	err := rewardC.Find(bson.M{"receiver._id":userId}).Sort("-create_time").All(&rewards)
+	err := rewardC.Find(bson.M{"receiver._id": userId}).Sort("-create_time").All(&rewards)
 	if nil != err {
 		panic(errors.New("ShowRewardMyCarry" + err.Error()))
 	}
