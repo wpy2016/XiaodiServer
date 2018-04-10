@@ -32,11 +32,12 @@ type User struct {
 	GoldMoney     float32 `json:"gold_money" bson:"gold_money"`       //金笑点
 	SilverMoney   float32 `json:"silver_money" bson:"silver_money"`   //银笑点
 	Sign          string  `json:"sign" bson:"sign"`                   //签名
-	Token         string  `json:"token" bson:"token"`                 //身份认证，需要不定时更新
+	Token         string  `json:"token" bson:"token"`                 //身份认证，需要不定时更新,这个token用于本服务器
+	RongyunToken  string  `json:"rongyun_token" bson:"rongyun_token"` //融云IM即时通讯的token，每个用户的标识
 }
 
 func (user *User) Save() {
-	session,userC := getUserDbCollection()
+	session, userC := getUserDbCollection()
 	defer session.Close()
 	err := userC.Insert(user)
 	if nil != err {
@@ -51,7 +52,7 @@ func UpdateUser(user *User) error {
 }
 
 func Login(phone, pass string) *User {
-	session,userC := getUserDbCollection()
+	session, userC := getUserDbCollection()
 	defer session.Close()
 	user := &User{}
 	err := userC.Find(bson.M{conf.USER_PHONE: phone, conf.USER_PASS: pass}).One(user)
@@ -61,30 +62,29 @@ func Login(phone, pass string) *User {
 	return user
 }
 
-func Auth(userId,realName,schoolId,campus string) {
-	session,userC := getUserDbCollection()
+func Auth(userId, realName, schoolId, campus string) {
+	session, userC := getUserDbCollection()
 	defer session.Close()
 	user := &User{}
 	err := userC.Find(bson.M{conf.ID: userId}).One(user)
 	if nil != err {
-		panic(BaseResp{StatusCode:conf.ERROR_USER_NOT_EXIST,StatusMsg:conf.ERROR_USER_NOT_EXIST_MSG})
+		panic(BaseResp{StatusCode: conf.ERROR_USER_NOT_EXIST, StatusMsg: conf.ERROR_USER_NOT_EXIST_MSG})
 	}
 	if conf.XIAODI_YUAN == user.UserType {
-		panic(BaseResp{StatusCode:conf.ERROR_USER_ALREADY_AUTH,StatusMsg:conf.ERROR_USER_ALREADY_AUTH_MSG})
+		panic(BaseResp{StatusCode: conf.ERROR_USER_ALREADY_AUTH, StatusMsg: conf.ERROR_USER_ALREADY_AUTH_MSG})
 	}
 	user.UserType = conf.XIAODI_YUAN
 	user.Campus = campus
 	user.RealName = realName
 	user.SchoolID = schoolId
-	err = userC.Update(bson.M{conf.ID: userId},user)
+	err = userC.Update(bson.M{conf.ID: userId}, user)
 	if nil != err {
 		panic(err)
 	}
 }
 
-
 func IsPhoneExist(phone string) (bool, error) {
-	session,userC := getUserDbCollection()
+	session, userC := getUserDbCollection()
 	defer session.Close()
 	count, err := userC.Find(bson.M{conf.USER_PHONE: phone}).Count()
 	if nil != err {
@@ -97,7 +97,7 @@ func IsPhoneExist(phone string) (bool, error) {
 }
 
 func IsNickNameExist(nickName string) (bool, error) {
-	session,userC := getUserDbCollection()
+	session, userC := getUserDbCollection()
 	defer session.Close()
 	count, err := userC.Find(bson.M{conf.USER_NICKNAME: nickName}).Count()
 	if nil != err {
@@ -110,7 +110,7 @@ func IsNickNameExist(nickName string) (bool, error) {
 }
 
 func GetUserById(id string) *User {
-	session ,userC := getUserDbCollection()
+	session, userC := getUserDbCollection()
 	defer session.Close()
 	user := &User{}
 	err := userC.Find(bson.M{conf.ID: id}).One(user)
@@ -135,7 +135,7 @@ func GetBaseUserById(id string) *BaseUser {
 	}
 }
 
-func getUserDbCollection() (*mgo.Session,*mgo.Collection) {
+func getUserDbCollection() (*mgo.Session, *mgo.Collection) {
 	dialInfo := db.CreateDialInfo()
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
@@ -144,7 +144,7 @@ func getUserDbCollection() (*mgo.Session,*mgo.Collection) {
 	session.SetMode(mgo.Monotonic, true)
 
 	userC := session.DB(conf.MGO_DB).C(conf.MGO_DB_USER_COLLECTION)
-	return session,userC
+	return session, userC
 }
 
 func RegisterDefaultUser(phone, decryptPass, nickName, imgPath string) *User {
