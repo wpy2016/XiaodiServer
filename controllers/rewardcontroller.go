@@ -12,10 +12,17 @@ import (
 func SendReward(ctx *context.Context) {
 	ctx.Request.ParseMultipartForm(1 << 21)
 	userId := ctx.Request.Form.Get(conf.REWARD_PUBLISH_USER_ID)
-	baseUser := models.GetBaseUserById(userId)
-	phone := ctx.Request.Form.Get(conf.USER_PHONE)
+	user := models.GetUserById(userId)
 	xiaodian := ctx.Request.Form.Get(conf.REWARD_XIAODIAN)
 	xiaodianInt, err := strconv.ParseInt(xiaodian, 10, 32)
+
+	//检查笑点是否充足
+	if user.GoldMoney+user.SilverMoney < int(xiaodianInt) {
+		panic(models.BaseResp{conf.ERROR_USER_XIAODIAN_SHORT, conf.ERROR_USER_XIAODIAN_SHORT_MSG})
+	}
+
+	baseUser := models.GetBaseUserById(userId)
+	phone := ctx.Request.Form.Get(conf.USER_PHONE)
 	if nil != err {
 		panic(models.BaseResp{conf.ERROR_XIAODIAN_LAYOUT, conf.ERROR_XIAODIAN_LAYOUT_MSG})
 	}
@@ -102,11 +109,10 @@ func ShowRewardOurNotFinish(ctx *context.Context) {
 	ctx.Request.ParseForm()
 	userId := ctx.Request.Form.Get(conf.REWARD_PUBLISH_USER_ID)
 	receiveId := ctx.Request.Form.Get(conf.RECEIVE_ID)
-	rewards := models.ShowRewardOurNotFinish(userId,receiveId)
+	rewards := models.ShowRewardOurNotFinish(userId, receiveId)
 	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
 	ctx.Output.JSON(rewardResp, true, false)
 }
-
 
 func ShowRewardMyCarry(ctx *context.Context) {
 	ctx.Request.ParseForm()
@@ -155,18 +161,28 @@ func ShowRewardKeyword(ctx *context.Context) {
 func CarryReward(ctx *context.Context) {
 	ctx.Request.ParseForm()
 	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
-	rewardId := ctx.Request.Form.Get(conf.ID)
+	rewardId := ctx.Request.Form.Get(conf.REWARD_ID)
 	models.CarryReward(rewardId, userId)
 	baseResp := models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}
 	ctx.Output.JSON(baseResp, true, false)
 }
 
 func DeliveryReward(ctx *context.Context) {
-
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	rewardId := ctx.Request.Form.Get(conf.REWARD_ID)
+	models.DeliveryReward(rewardId, userId)
+	baseResp := models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}
+	ctx.Output.JSON(baseResp, true, false)
 }
 
 func FinishReward(ctx *context.Context) {
-
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	rewardId := ctx.Request.Form.Get(conf.REWARD_ID)
+	models.FinishReward(rewardId, userId)
+	baseResp := models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}
+	ctx.Output.JSON(baseResp, true, false)
 }
 
 func Evaluate(ctx *context.Context) {

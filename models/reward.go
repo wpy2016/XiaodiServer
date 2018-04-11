@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"time"
 	"errors"
+	"fmt"
 )
 
 type Thing struct {
@@ -26,8 +27,8 @@ type Reward struct {
 	OriginLocation string    `json:"origin_location" bson:"origin_location"`
 	DstLocation    string    `json:"dst_location" bson:"dst_location"`
 	Receiver       BaseUser  `json:"receiver" bson:"receiver"`
-	PublisherGrade float32   `json:"publisher_grade" bson:"publisher_grade"`
-	ReceiveGrade   float32   `json:"receive_grade" bson:"receive_grade"`
+	PublisherGrade int       `json:"publisher_grade" bson:"publisher_grade"`
+	ReceiveGrade   int       `json:"receive_grade" bson:"receive_grade"`
 	Describe       string    `json:"describe" bson:"describe"`
 	Thing          Thing     `json:"thing" bson:"thing"`
 	CreateTime     time.Time `json:"create_time" bson:"create_time"`
@@ -112,19 +113,19 @@ func ShowRewardOurNotFinish(userId, receiveId string) []Reward {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
 	var rewardmySend []Reward
-	err := rewardC.Find(bson.M{"publisher._id": userId, "receiver._id": receiveId,"state":bson.M{"$ne":conf.REWARD_FINISH}}).Sort("-create_time").All(&rewardmySend)
+	err := rewardC.Find(bson.M{"publisher._id": userId, "receiver._id": receiveId, "state": bson.M{"$ne": conf.REWARD_FINISH}}).Sort("-create_time").All(&rewardmySend)
 	if nil != err {
 		panic(errors.New("ShowRewardOur" + err.Error()))
 	}
 	var rewardmyCarry []Reward
-	err = rewardC.Find(bson.M{"publisher._id": receiveId, "receiver._id": userId,"state":bson.M{"$ne":conf.REWARD_FINISH}}).Sort("-create_time").All(&rewardmyCarry)
+	err = rewardC.Find(bson.M{"publisher._id": receiveId, "receiver._id": userId, "state": bson.M{"$ne": conf.REWARD_FINISH}}).Sort("-create_time").All(&rewardmyCarry)
 	if nil != err {
 		panic(errors.New("ShowRewardOur" + err.Error()))
 	}
 
 	var rewards []Reward
-	rewards = append(rewards,rewardmySend...)
-	rewards = append(rewards,rewardmyCarry...)
+	rewards = append(rewards, rewardmySend...)
+	rewards = append(rewards, rewardmyCarry...)
 	return rewards
 }
 
@@ -192,6 +193,49 @@ func CarryReward(rewardId, userId string) {
 		"$set": bson.M{
 			"state":    conf.REWARD_CARRY,
 			"receiver": user,
+		}})
+	if nil != err {
+		panic(BaseResp{444, err.Error()})
+	}
+}
+
+func DeliveryReward(rewardId, userId string) {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	reward := &Reward{}
+	err := rewardC.Find(bson.M{conf.ID: rewardId}).One(reward)
+	if nil != err {
+		panic(BaseResp{conf.REWARD_NOT_EXIST, conf.REWARD_NOT_EXIST_MSG})
+	}
+	if (userId != reward.Receiver.ID) {
+		panic(BaseResp{conf.HAVE_NOT_PERMISSION, conf.HAVE_NOT_PERMISSION_MSG})
+	}
+	err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{
+		"$set": bson.M{
+			"state": conf.REWARD_ARRIVE,
+		}})
+	if nil != err {
+		panic(BaseResp{444, err.Error()})
+	}
+}
+
+func FinishReward(rewardId, userId string) {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	reward := &Reward{}
+	err := rewardC.Find(bson.M{conf.ID: rewardId}).One(reward)
+	if nil != err {
+		panic(BaseResp{conf.REWARD_NOT_EXIST, conf.REWARD_NOT_EXIST_MSG})
+	}
+	if (userId != reward.Publisher.ID) {
+		panic(BaseResp{conf.HAVE_NOT_PERMISSION, conf.HAVE_NOT_PERMISSION_MSG})
+	}
+	//进行笑点转移
+	moveXiaodian(reward.Publisher.ID, reward.Receiver.ID, reward.Xiaodian)
+
+	err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{
+		"$set": bson.M{
+			"state": conf.REWARD_FINISH,
 		}})
 	if nil != err {
 		panic(BaseResp{444, err.Error()})

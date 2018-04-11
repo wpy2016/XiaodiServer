@@ -29,8 +29,8 @@ type User struct {
 	Img           string  `json:"img" bson:"img"`                     //头像
 	Creditibility float32 `json:"creditibility" bson:"creditibility"` //信誉度
 	Pass          string  `json:"pass" bson:"pass"`                   //密码
-	GoldMoney     float32 `json:"gold_money" bson:"gold_money"`       //金笑点
-	SilverMoney   float32 `json:"silver_money" bson:"silver_money"`   //银笑点
+	GoldMoney     int `json:"gold_money" bson:"gold_money"`       //金笑点
+	SilverMoney   int `json:"silver_money" bson:"silver_money"`   //银笑点
 	Sign          string  `json:"sign" bson:"sign"`                   //签名
 	Token         string  `json:"token" bson:"token"`                 //身份认证，需要不定时更新,这个token用于本服务器
 	RongyunToken  string  `json:"rongyun_token" bson:"rongyun_token"` //融云IM即时通讯的token，每个用户的标识
@@ -160,4 +160,40 @@ func RegisterDefaultUser(phone, decryptPass, nickName, imgPath string) *User {
 	user.Img = imgPath
 	user.Token = bson.NewObjectId().Hex()
 	return &user
+}
+
+func moveXiaodian(publisherId, receiverId string, xiaodian int) {
+	publisher := GetUserById(publisherId)
+	receiver := GetUserById(receiverId)
+	//首先使用充值进来的笑点进行消费,再使用代送获取的笑点，都不足，便一起使用
+	if publisher.GoldMoney >= xiaodian {
+		publisher.GoldMoney = publisher.GoldMoney - xiaodian
+		receiver.SilverMoney = receiver.SilverMoney + xiaodian
+		updateUser(publisher)
+		updateUser(receiver)
+		return
+	}
+
+	//金笑点不够，但金银笑点加起来够,这时候，消耗全部金笑点，银笑点再减去不足的部分
+	if publisher.GoldMoney+publisher.SilverMoney >= xiaodian {
+		publisher.SilverMoney = publisher.SilverMoney - (xiaodian - publisher.GoldMoney)
+		publisher.GoldMoney = 0
+		receiver.SilverMoney = receiver.SilverMoney + xiaodian
+		updateUser(publisher)
+		updateUser(receiver)
+		return
+	}
+
+	//发布者笑点不足
+	panic(BaseResp{conf.ERROR_USER_XIAODIAN_SHORT, conf.ERROR_USER_XIAODIAN_SHORT_MSG})
+}
+
+func updateUser(user *User) {
+	GetUserById(user.ID) //主要用来检查错误，用户是否存在
+	session, userC := getUserDbCollection()
+	defer session.Close()
+	err := userC.Update(bson.M{conf.ID: user.ID}, user)
+	if nil != err {
+		panic(err)
+	}
 }
