@@ -62,4 +62,7 @@ const (
 
 	HAVE_NOT_PERMISSION     = 3017
 	HAVE_NOT_PERMISSION_MSG = "你没有权限"
+
+	REWARD_NOT_FINISH     = 3018
+	REWARD_NOT_FINISH_MSG = "此悬赏还未完成"
 )

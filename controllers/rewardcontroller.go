@@ -186,7 +186,18 @@ func FinishReward(ctx *context.Context) {
 }
 
 func Evaluate(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	rewardId := ctx.Request.Form.Get(conf.REWARD_ID)
+	evaluate := ctx.Request.Form.Get(conf.EVALUATE)
 
+	evaluateFloat, err := strconv.ParseFloat(evaluate, 32)
+	if nil != err {
+		panic(err)
+	}
+	models.EvaluateReward(rewardId, userId, float32(evaluateFloat))
+	baseResp := models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}
+	ctx.Output.JSON(baseResp, true, false)
 }
 
 func getThing(ctx *context.Context) models.Thing {

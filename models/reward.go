@@ -7,7 +7,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"time"
 	"errors"
-	"fmt"
 )
 
 type Thing struct {
@@ -27,8 +26,8 @@ type Reward struct {
 	OriginLocation string    `json:"origin_location" bson:"origin_location"`
 	DstLocation    string    `json:"dst_location" bson:"dst_location"`
 	Receiver       BaseUser  `json:"receiver" bson:"receiver"`
-	PublisherGrade int       `json:"publisher_grade" bson:"publisher_grade"`
-	ReceiveGrade   int       `json:"receive_grade" bson:"receive_grade"`
+	PublisherGrade float32   `json:"publisher_grade" bson:"publisher_grade"`
+	ReceiveGrade   float32   `json:"receive_grade" bson:"receive_grade"`
 	Describe       string    `json:"describe" bson:"describe"`
 	Thing          Thing     `json:"thing" bson:"thing"`
 	CreateTime     time.Time `json:"create_time" bson:"create_time"`
@@ -207,7 +206,7 @@ func DeliveryReward(rewardId, userId string) {
 	if nil != err {
 		panic(BaseResp{conf.REWARD_NOT_EXIST, conf.REWARD_NOT_EXIST_MSG})
 	}
-	if (userId != reward.Receiver.ID) {
+	if userId != reward.Receiver.ID {
 		panic(BaseResp{conf.HAVE_NOT_PERMISSION, conf.HAVE_NOT_PERMISSION_MSG})
 	}
 	err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{
@@ -219,6 +218,48 @@ func DeliveryReward(rewardId, userId string) {
 	}
 }
 
+func EvaluateReward(rewardId, userId string, evaluate float32) {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	reward := &Reward{}
+	err := rewardC.Find(bson.M{conf.ID: rewardId}).One(reward)
+	if nil != err {
+		panic(BaseResp{conf.REWARD_NOT_EXIST, conf.REWARD_NOT_EXIST_MSG})
+	}
+	if conf.REWARD_FINISH != reward.State {
+		panic(BaseResp{conf.REWARD_NOT_FINISH, conf.REWARD_NOT_FINISH_MSG})
+	}
+	if userId == reward.Publisher.ID {
+		reward.ReceiveGrade = evaluate
+		err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{
+			"$set": bson.M{
+				"receive_grade": evaluate,
+			}})
+		if nil != err {
+			panic(BaseResp{444, err.Error()})
+		}
+		//将评分输出到用户上
+		user := GetUserById(reward.Receiver.ID)
+		oldEvaluate := user.Creditibility
+		user.Creditibility = (oldEvaluate + evaluate) / 2.0
+		updateUser(user)
+		return
+	}
+	reward.PublisherGrade = evaluate
+	err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{
+		"$set": bson.M{
+			"publisher_grade": evaluate,
+		}})
+	if nil != err {
+		panic(BaseResp{444, err.Error()})
+	}
+	//将评分输出到用户上
+	user := GetUserById(reward.Publisher.ID)
+	oldEvaluate := user.Creditibility
+	user.Creditibility = (oldEvaluate + evaluate) / 2.0
+	updateUser(user)
+}
+
 func FinishReward(rewardId, userId string) {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
@@ -227,7 +268,7 @@ func FinishReward(rewardId, userId string) {
 	if nil != err {
 		panic(BaseResp{conf.REWARD_NOT_EXIST, conf.REWARD_NOT_EXIST_MSG})
 	}
-	if (userId != reward.Publisher.ID) {
+	if userId != reward.Publisher.ID {
 		panic(BaseResp{conf.HAVE_NOT_PERMISSION, conf.HAVE_NOT_PERMISSION_MSG})
 	}
 	//进行笑点转移
