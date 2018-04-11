@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="920117b7-b4e4-4169-87b7-bb6b43160115" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/conf/db.conf.go" afterPath="$PROJECT_DIR$/conf/db.conf.go" />
       <change beforePath="$PROJECT_DIR$/conf/error_code.go" afterPath="$PROJECT_DIR$/conf/error_code.go" />
-      <change beforePath="$PROJECT_DIR$/controllers/rewardcontroller.go" afterPath="$PROJECT_DIR$/controllers/rewardcontroller.go" />
       <change beforePath="$PROJECT_DIR$/models/reward.go" afterPath="$PROJECT_DIR$/models/reward.go" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,8 +20,8 @@
       <file leaf-file-name="reward.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/models/reward.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="517">
-              <caret line="253" column="41" lean-forward="true" selection-start-line="253" selection-start-column="41" selection-end-line="253" selection-end-column="41" />
+            <state relative-caret-position="428">
+              <caret line="247" column="24" lean-forward="true" selection-start-line="247" selection-start-column="24" selection-end-line="247" selection-end-column="24" />
               <folding />
             </state>
           </provider>
@@ -42,8 +40,8 @@
       <file leaf-file-name="error_code.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/conf/error_code.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="562">
-              <caret line="48" column="34" lean-forward="true" selection-start-line="48" selection-start-column="34" selection-end-line="48" selection-end-column="34" />
+            <state relative-caret-position="868">
+              <caret line="68" column="27" lean-forward="false" selection-start-line="68" selection-start-column="4" selection-end-line="68" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -693,14 +691,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/conf/error_code.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="562">
-          <caret line="48" column="34" lean-forward="true" selection-start-line="48" selection-start-column="34" selection-end-line="48" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/routers/router.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="561">
@@ -717,16 +707,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/controllers/rewardcontroller.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="608">
-          <caret line="197" column="21" lean-forward="false" selection-start-line="197" selection-start-column="21" selection-end-line="197" selection-end-column="21" />
-          <folding>
-            <element signature="e#21#154#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/models/user.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="834">
@@ -737,10 +717,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/conf/error_code.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="868">
+          <caret line="68" column="27" lean-forward="false" selection-start-line="68" selection-start-column="4" selection-end-line="68" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controllers/rewardcontroller.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="608">
+          <caret line="197" column="21" lean-forward="false" selection-start-line="197" selection-start-column="21" selection-end-line="197" selection-end-column="21" />
+          <folding>
+            <element signature="e#21#154#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/models/reward.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="517">
-          <caret line="253" column="41" lean-forward="true" selection-start-line="253" selection-start-column="41" selection-end-line="253" selection-end-column="41" />
+        <state relative-caret-position="428">
+          <caret line="247" column="24" lean-forward="true" selection-start-line="247" selection-start-column="24" selection-end-line="247" selection-end-column="24" />
           <folding />
         </state>
       </provider>

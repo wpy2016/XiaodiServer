@@ -230,6 +230,9 @@ func EvaluateReward(rewardId, userId string, evaluate float32) {
 		panic(BaseResp{conf.REWARD_NOT_FINISH, conf.REWARD_NOT_FINISH_MSG})
 	}
 	if userId == reward.Publisher.ID {
+		if 0 != reward.ReceiveGrade {
+			panic(BaseResp{conf.REWARD_ALREADY_EVALUATE,conf.REWARD_ALREADY_EVALUATE_MSG})
+		}
 		reward.ReceiveGrade = evaluate
 		err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{
 			"$set": bson.M{
@@ -244,6 +247,9 @@ func EvaluateReward(rewardId, userId string, evaluate float32) {
 		user.Creditibility = (oldEvaluate + evaluate) / 2.0
 		updateUser(user)
 		return
+	}
+	if 0 != reward.PublisherGrade {
+		panic(BaseResp{conf.REWARD_ALREADY_EVALUATE,conf.REWARD_ALREADY_EVALUATE_MSG})
 	}
 	reward.PublisherGrade = evaluate
 	err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{
