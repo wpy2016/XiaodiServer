@@ -118,6 +118,9 @@ func UpdateNickname(userId, nickName string) {
 	if nil != err {
 		panic(err)
 	}
+
+	//联动更新reward
+	UpdateUserNickName(userId, nickName)
 }
 
 func UpdateImg(userId, imgurl string) {
@@ -131,6 +134,8 @@ func UpdateImg(userId, imgurl string) {
 	if nil != err {
 		panic(err)
 	}
+	//联动更新reward
+	UpdateUserImg(userId, imgurl)
 }
 
 func IsPhoneExist(phone string) (bool, error) {

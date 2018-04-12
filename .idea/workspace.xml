@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="920117b7-b4e4-4169-87b7-bb6b43160115" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/conf/db.conf.go" afterPath="$PROJECT_DIR$/conf/db.conf.go" />
-      <change beforePath="$PROJECT_DIR$/conf/error_code.go" afterPath="$PROJECT_DIR$/conf/error_code.go" />
-      <change beforePath="$PROJECT_DIR$/controllers/usercontroller.go" afterPath="$PROJECT_DIR$/controllers/usercontroller.go" />
+      <change beforePath="$PROJECT_DIR$/models/reward.go" afterPath="$PROJECT_DIR$/models/reward.go" />
       <change beforePath="$PROJECT_DIR$/models/user.go" afterPath="$PROJECT_DIR$/models/user.go" />
-      <change beforePath="$PROJECT_DIR$/routers/router.go" afterPath="$PROJECT_DIR$/routers/router.go" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,11 +17,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="reward.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="reward.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/models/reward.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="144" column="24" lean-forward="true" selection-start-line="144" selection-start-column="24" selection-end-line="144" selection-end-column="24" />
+            <state relative-caret-position="616">
+              <caret line="355" column="21" lean-forward="true" selection-start-line="355" selection-start-column="21" selection-end-line="355" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="session.go" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/go_depence/src/gopkg.in/mgo.v2/session.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="517">
+              <caret line="2499" column="21" lean-forward="false" selection-start-line="2499" selection-start-column="21" selection-end-line="2499" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -61,7 +67,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="usercontroller.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="usercontroller.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/controllers/usercontroller.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="317">
@@ -84,8 +90,8 @@
       <file leaf-file-name="user.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models/user.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="122" column="39" lean-forward="true" selection-start-line="122" selection-start-column="39" selection-end-line="122" selection-end-column="39" />
+            <state relative-caret-position="1666">
+              <caret line="103" column="43" lean-forward="true" selection-start-line="103" selection-start-column="43" selection-end-line="103" selection-end-column="43" />
               <folding>
                 <element signature="n#!!block;n#updateUser#0" expanded="false" />
               </folding>
@@ -111,16 +117,6 @@
               <folding>
                 <element signature="e#16#135#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="time.go" pinned="false" current-in-tab="false">
-        <entry file="file:///usr/local/go/src/time/time.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="325">
-              <caret line="491" column="25" lean-forward="false" selection-start-line="491" selection-start-column="25" selection-end-line="491" selection-end-column="25" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -227,7 +223,6 @@
         <option value="$PROJECT_DIR$/controllers/picturecontroller.go" />
         <option value="$PROJECT_DIR$/controllers/basecontroller.go" />
         <option value="$PROJECT_DIR$/models/rongyun_im.go" />
-        <option value="$PROJECT_DIR$/models/reward.go" />
         <option value="$PROJECT_DIR$/controllers/rewardcontroller.go" />
         <option value="$PROJECT_DIR$/models/SignResp.go" />
         <option value="$PROJECT_DIR$/routers/router.go" />
@@ -236,6 +231,7 @@
         <option value="$PROJECT_DIR$/conf/error_code.go" />
         <option value="$PROJECT_DIR$/models/sign.go" />
         <option value="$PROJECT_DIR$/models/user.go" />
+        <option value="$PROJECT_DIR$/models/reward.go" />
       </list>
     </option>
   </component>
@@ -245,11 +241,9 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
-    <option name="x" value="-113" />
-    <option name="y" value="-1050" />
-    <option name="width" value="1680" />
-    <option name="height" value="1050" />
+  <component name="ProjectFrameBounds" fullScreen="true">
+    <option name="width" value="1440" />
+    <option name="height" value="900" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -355,10 +349,10 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-113" y="-1050" width="1680" height="1050" extended-state="6" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.11369047" sideWeight="0.7717647" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13263889" sideWeight="0.7717647" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -580,14 +574,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/go_depence/src/gopkg.in/mgo.v2/session.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1080" column="18" lean-forward="false" selection-start-line="1080" selection-start-column="18" selection-end-line="1080" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/go_depence/src/github.com/astaxie/beego/context/context.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="301">
@@ -702,29 +688,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/reward.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="144" column="24" lean-forward="true" selection-start-line="144" selection-start-column="24" selection-end-line="144" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/conf/error_code.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
           <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/user.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="122" column="39" lean-forward="true" selection-start-line="122" selection-start-column="39" selection-end-line="122" selection-end-column="39" />
-          <folding>
-            <element signature="n#!!block;n#updateUser#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -748,6 +716,32 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="317">
           <caret line="132" column="5" lean-forward="false" selection-start-line="132" selection-start-column="5" selection-end-line="132" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/go_depence/src/gopkg.in/mgo.v2/session.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="517">
+          <caret line="2499" column="21" lean-forward="false" selection-start-line="2499" selection-start-column="21" selection-end-line="2499" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/user.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1666">
+          <caret line="103" column="43" lean-forward="true" selection-start-line="103" selection-start-column="43" selection-end-line="103" selection-end-column="43" />
+          <folding>
+            <element signature="n#!!block;n#updateUser#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/reward.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="616">
+          <caret line="355" column="21" lean-forward="true" selection-start-line="355" selection-start-column="21" selection-end-line="355" selection-end-column="21" />
           <folding />
         </state>
       </provider>

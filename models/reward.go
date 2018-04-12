@@ -7,6 +7,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"time"
 	"errors"
+	"fmt"
+	"strconv"
 )
 
 type Thing struct {
@@ -146,7 +148,7 @@ func ShowRewardMyFinish(userId string) []Reward {
 	err := rewardC.Find(bson.M{
 		"$or": []bson.M{
 			bson.M{"publisher._id": userId, "state": conf.REWARD_FINISH},
-		bson.M{"receiver._id": userId, "state": conf.REWARD_FINISH}}}).Sort("-create_time").All(&rewards)
+			bson.M{"receiver._id": userId, "state": conf.REWARD_FINISH}}}).Sort("-create_time").All(&rewards)
 	if nil != err {
 		panic(errors.New("ShowRewardMyCarry" + err.Error()))
 	}
@@ -168,6 +170,72 @@ func ShowRewardSortXiaodian(pages int) []Reward {
 	return rewards
 }
 
+//更新由于用户数据更新导致reward中的publisher，receiver的信息更新
+func UpdateUserNickName(userId, newNickName string) {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	_, err := rewardC.UpdateAll(bson.M{"publisher._id": userId}, bson.M{
+		"$set": bson.M{
+			"publisher.nick_name": newNickName,
+		}})
+	if nil != err {
+		panic(err)
+	}
+
+	_, err = rewardC.UpdateAll(bson.M{"receiver._id": userId}, bson.M{
+		"$set": bson.M{
+			"receiver.nick_name": newNickName,
+		}})
+	if nil != err {
+		panic(err)
+	}
+}
+
+//更新由于用户数据更新导致reward中的publisher，receiver的信息更新
+func UpdateUserImg(userId, imgurl string) {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	_, err := rewardC.UpdateAll(bson.M{"publisher._id": userId}, bson.M{
+		"$set": bson.M{
+			"publisher.img": imgurl,
+		}})
+	if nil != err {
+		panic(err)
+	}
+
+	_, err = rewardC.UpdateAll(bson.M{"receiver._id": userId}, bson.M{
+		"$set": bson.M{
+			"receiver.img": imgurl,
+		}})
+	if nil != err {
+		panic(err)
+	}
+}
+
+//更新由于用户数据更新导致reward中的publisher，receiver的信息更新
+func UpdateUserCreditibility(userId string, credibility float32) {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	_, err := rewardC.UpdateAll(bson.M{"publisher._id": userId}, bson.M{
+		"$set": bson.M{
+			"publisher.creditibility": credibility,
+		}})
+	if nil != err {
+		panic(err)
+	}
+
+	_, err = rewardC.UpdateAll(bson.M{"receiver._id": userId}, bson.M{
+		"$set": bson.M{
+			"receiver.creditibility": credibility,
+		}})
+	if nil != err {
+		panic(err)
+	}
+}
+
+/**
+* 未完成关键字
+ */
 func ShowRewardKeyword(pages int, key string) []Reward {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
@@ -259,7 +327,12 @@ func EvaluateReward(rewardId, userId string, evaluate float32) {
 		user := GetUserById(reward.Receiver.ID)
 		oldEvaluate := user.Creditibility
 		user.Creditibility = (oldEvaluate + evaluate) / 2.0
+		desireCreditibility, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", user.Creditibility), 32)
+		user.Creditibility = float32(desireCreditibility)
 		updateUser(user)
+
+		//联动更新其他reward中的user
+		UpdateUserCreditibility(user.ID, user.Creditibility)
 		return
 	}
 	if 0 != reward.PublisherGrade {
@@ -277,7 +350,10 @@ func EvaluateReward(rewardId, userId string, evaluate float32) {
 	user := GetUserById(reward.Publisher.ID)
 	oldEvaluate := user.Creditibility
 	user.Creditibility = (oldEvaluate + evaluate) / 2.0
+	desireCreditibility, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", user.Creditibility), 32)
+	user.Creditibility = float32(desireCreditibility)
 	updateUser(user)
+	UpdateUserCreditibility(user.ID, user.Creditibility)
 }
 
 func FinishReward(rewardId, userId string) {
