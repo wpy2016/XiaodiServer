@@ -29,8 +29,8 @@ type User struct {
 	Img           string  `json:"img" bson:"img"`                     //头像
 	Creditibility float32 `json:"creditibility" bson:"creditibility"` //信誉度
 	Pass          string  `json:"pass" bson:"pass"`                   //密码
-	GoldMoney     int `json:"gold_money" bson:"gold_money"`       //金笑点
-	SilverMoney   int `json:"silver_money" bson:"silver_money"`   //银笑点
+	GoldMoney     int     `json:"gold_money" bson:"gold_money"`       //金笑点
+	SilverMoney   int     `json:"silver_money" bson:"silver_money"`   //银笑点
 	Sign          string  `json:"sign" bson:"sign"`                   //签名
 	Token         string  `json:"token" bson:"token"`                 //身份认证，需要不定时更新,这个token用于本服务器
 	RongyunToken  string  `json:"rongyun_token" bson:"rongyun_token"` //融云IM即时通讯的token，每个用户的标识

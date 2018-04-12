@@ -122,6 +122,14 @@ func ShowRewardMyCarry(ctx *context.Context) {
 	ctx.Output.JSON(rewardResp, true, false)
 }
 
+func ShowRewardMyFinish(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	rewards := models.ShowRewardMyFinish(userId)
+	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
+	ctx.Output.JSON(rewardResp, true, false)
+}
+
 func ShowReward(ctx *context.Context) {
 	ctx.Request.ParseForm()
 	pages := ctx.Request.Form.Get(conf.REWARD_PAGES)

@@ -19,6 +19,8 @@ func init() {
 		beego.NSPost("/get", controllers.AssertToken(controllers.GetMyInfo)),
 		beego.NSPost("/get/id", controllers.AssertToken(controllers.GetUserInfo)),
 		beego.NSPost("/auth", controllers.AssertToken(controllers.Auth)),
+		beego.NSPost("/sign", controllers.AssertToken(controllers.Sign)),
+		beego.NSPost("/sign/list", controllers.AssertToken(controllers.MySignList)),
 		beego.NSGet("/exist/nickname/:nickname", controllers.IsNickNameExist),
 		beego.NSGet("/exist/phone/:phone", controllers.IsPhoneExist),
 	)
@@ -29,6 +31,7 @@ func init() {
 		beego.NSPost("/show/our_not_finish", controllers.AssertToken(controllers.ShowRewardOurNotFinish)),
 		beego.NSPost("/show/my/send", controllers.AssertToken(controllers.ShowRewardMySend)),
 		beego.NSPost("/show/my/carry", controllers.AssertToken(controllers.ShowRewardMyCarry)),
+		beego.NSPost("/show/my/finish", controllers.AssertToken(controllers.ShowRewardMyFinish)),
 		beego.NSPost("/show/xiaodian", controllers.AssertToken(controllers.ShowRewardSortXiaodian)),
 		beego.NSPost("/show/keyword", controllers.AssertToken(controllers.ShowRewardKeyword)),
 		beego.NSPost("/carry", controllers.AssertToken(controllers.CarryReward)),

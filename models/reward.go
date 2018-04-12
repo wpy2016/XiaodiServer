@@ -139,6 +139,20 @@ func ShowRewardMyCarry(userId string) []Reward {
 	return rewards
 }
 
+func ShowRewardMyFinish(userId string) []Reward {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	var rewards []Reward
+	err := rewardC.Find(bson.M{
+		"$or": []bson.M{
+			bson.M{"publisher._id": userId, "state": conf.REWARD_FINISH},
+		bson.M{"receiver._id": userId, "state": conf.REWARD_FINISH}}}).Sort("-create_time").All(&rewards)
+	if nil != err {
+		panic(errors.New("ShowRewardMyCarry" + err.Error()))
+	}
+	return rewards
+}
+
 func ShowRewardSortXiaodian(pages int) []Reward {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()
@@ -231,7 +245,7 @@ func EvaluateReward(rewardId, userId string, evaluate float32) {
 	}
 	if userId == reward.Publisher.ID {
 		if 0 != reward.ReceiveGrade {
-			panic(BaseResp{conf.REWARD_ALREADY_EVALUATE,conf.REWARD_ALREADY_EVALUATE_MSG})
+			panic(BaseResp{conf.REWARD_ALREADY_EVALUATE, conf.REWARD_ALREADY_EVALUATE_MSG})
 		}
 		reward.ReceiveGrade = evaluate
 		err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{
@@ -249,7 +263,7 @@ func EvaluateReward(rewardId, userId string, evaluate float32) {
 		return
 	}
 	if 0 != reward.PublisherGrade {
-		panic(BaseResp{conf.REWARD_ALREADY_EVALUATE,conf.REWARD_ALREADY_EVALUATE_MSG})
+		panic(BaseResp{conf.REWARD_ALREADY_EVALUATE, conf.REWARD_ALREADY_EVALUATE_MSG})
 	}
 	reward.PublisherGrade = evaluate
 	err = rewardC.Update(bson.M{conf.ID: rewardId}, bson.M{

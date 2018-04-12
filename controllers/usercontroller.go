@@ -12,6 +12,7 @@ import (
 	"mime/multipart"
 	"os"
 	"strings"
+	"fmt"
 )
 
 type UserController struct {
@@ -42,7 +43,7 @@ func Register(ctx *context.Context) {
 	httpImgPath := conf.IMG_HEAD_HTTP + imgPath
 	decryptPass := encrypt.Base64AesDecrypt(pass)
 	user := models.RegisterDefaultUser(phone, decryptPass, nickName, httpImgPath)
-	rongToken,err := models.GetRongyunToken(user.ID,user.NickName,httpImgPath)
+	rongToken, err := models.GetRongyunToken(user.ID, user.NickName, httpImgPath)
 	if nil != err {
 		panic(err)
 	}
@@ -121,8 +122,27 @@ func Auth(ctx *context.Context) {
 
 	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
 }
+
+func Sign(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	day := ctx.Request.Form.Get(conf.SIGN_DAY)
+	models.SignToday(userId, day)
+	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
+}
+
+func MySignList(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	year := ctx.Request.Form.Get(conf.SIGN_YEAR)
+	month := ctx.Request.Form.Get(conf.SIGN_MONTH)
+	days := models.MySignList(userId, year, month)
+	ctx.Output.JSON(models.SignResp{conf.SUCCESS, conf.SUCCESS_MSG, days}, true, false)
+}
+
 func getInfoFormSchool(schoolId, schoolPass string) (string, string) {
 
+	//todo
 	return "", "大数据与软件学院"
 }
 

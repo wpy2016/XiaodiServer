@@ -10,6 +10,7 @@ const (
 	MGO_DB_USER_COLLECTION   = "user"
 	MGO_DB_TOKEN_COLLECTION  = "token"
 	MGO_DB_REWARD_COLLECTION = "reward"
+	MGO_DB_SIGN_COLLECTION   = "sign"
 
 	//section conf
 	ID                 = "_id"
@@ -26,6 +27,9 @@ const (
 	USER_CREDITIBILITY = "creditibility"
 	USER_SIGN          = "sign"
 	USER_SCHOOL_PASS   = "school_pass"
+	SIGN_DAY           = "day"
+	SIGN_YEAR          = "year"
+	SIGN_MONTH         = "month"
 
 	THING_TYPE      = "thing_type"
 	THING_THUMBNAIL = "thumbnail"
