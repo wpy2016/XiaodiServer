@@ -18,6 +18,7 @@ const (
 	USER_REALNAME      = "real_name"
 	USER_PHONE         = "phone"
 	USER_PASS          = "pass"
+	OLD_USER_PASS      = "old_pass"
 	USER_TYPE          = "user_type"
 	USER_CAMPUS        = "campus"
 	USER_SCHOOL_ID     = "school_id"

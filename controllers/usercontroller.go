@@ -12,7 +12,6 @@ import (
 	"mime/multipart"
 	"os"
 	"strings"
-	"fmt"
 )
 
 type UserController struct {
@@ -128,6 +127,35 @@ func Sign(ctx *context.Context) {
 	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
 	day := ctx.Request.Form.Get(conf.SIGN_DAY)
 	models.SignToday(userId, day)
+	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
+}
+
+func UpdatePass(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	newPass := ctx.Request.Form.Get(conf.USER_PASS)
+	oldPass := ctx.Request.Form.Get(conf.OLD_USER_PASS)
+	newDecryptPass := encrypt.Base64AesDecrypt(newPass)
+	oldDecryptPass := encrypt.Base64AesDecrypt(oldPass)
+	models.UpdatePass(userId, oldDecryptPass, newDecryptPass)
+	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
+}
+
+func UpdateNickname(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	nickName := ctx.Request.Form.Get(conf.USER_NICKNAME)
+	models.UpdateNickname(userId, nickName)
+	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
+}
+
+func UpdateImg(ctx *context.Context) {
+	ctx.Request.ParseMultipartForm(1 << 21)
+	file, fHead, _ := ctx.Request.FormFile("img")
+	imgPath, _ := uploadFile(file, fHead, conf.UPLOAD_IMG_HEAD_FILE_PATH)
+	httpImgPath := conf.IMG_HEAD_HTTP + imgPath
+	userId := ctx.Request.Form.Get(conf.TOKEN_USER_ID)
+	models.UpdateImg(userId, httpImgPath)
 	ctx.Output.JSON(models.BaseResp{conf.SUCCESS, conf.SUCCESS_MSG}, true, false)
 }
 

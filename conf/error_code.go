@@ -74,4 +74,7 @@ const (
 
 	THIS_MONTH_YOU_HAVE_NOT_SIGN     = 3021
 	THIS_MONTH_YOU_HAVE_NOT_SIGN_MSG = "这个月暂无签到信息"
+
+	OLD_PASS_ERROR     = 3022
+	OLD_PASS_ERROR_MSG = "旧密码错误"
 )

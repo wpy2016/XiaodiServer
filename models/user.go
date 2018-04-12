@@ -83,6 +83,56 @@ func Auth(userId, realName, schoolId, campus string) {
 	}
 }
 
+func UpdatePass(userId, oldDecryptPass, newDecryptPss string) {
+	user := GetUserById(userId)
+	if oldDecryptPass != user.Pass {
+		panic(BaseResp{conf.OLD_PASS_ERROR, conf.OLD_PASS_ERROR_MSG})
+	}
+	session, userC := getUserDbCollection()
+	defer session.Close()
+	err := userC.Update(bson.M{conf.ID: user.ID}, bson.M{
+		"$set": bson.M{
+			"pass": newDecryptPss,
+		}})
+	if nil != err {
+		panic(err)
+	}
+}
+
+func UpdateNickname(userId, nickName string) {
+	user := GetUserById(userId)
+	session, userC := getUserDbCollection()
+	defer session.Close()
+	//判断用户名是否已经存在
+	userToCheckNickName := &User{}
+	err := userC.Find(bson.M{conf.USER_NICKNAME: nickName}).One(userToCheckNickName)
+	if nil == err {
+		panic(BaseResp{conf.ERROR_NICKNAME_EXIST, conf.ERROR_NICKNAME_EXIST_MSG})
+	}
+
+	err = nil
+	err = userC.Update(bson.M{conf.ID: user.ID}, bson.M{
+		"$set": bson.M{
+			"nick_name": nickName,
+		}})
+	if nil != err {
+		panic(err)
+	}
+}
+
+func UpdateImg(userId, imgurl string) {
+	user := GetUserById(userId)
+	session, userC := getUserDbCollection()
+	defer session.Close()
+	err := userC.Update(bson.M{conf.ID: user.ID}, bson.M{
+		"$set": bson.M{
+			"img": imgurl,
+		}})
+	if nil != err {
+		panic(err)
+	}
+}
+
 func IsPhoneExist(phone string) (bool, error) {
 	session, userC := getUserDbCollection()
 	defer session.Close()
