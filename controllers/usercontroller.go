@@ -12,6 +12,7 @@ import (
 	"mime/multipart"
 	"os"
 	"strings"
+	"fmt"
 )
 
 type UserController struct {
@@ -76,6 +77,13 @@ func Login(ctx *context.Context) {
 	userResp.StatusMsg = conf.SUCCESS_MSG
 	userResp.User = *user
 	ctx.Output.JSON(userResp, true, false)
+}
+
+func Recharge(ctx *context.Context) {
+	defer CatchErr(ctx)
+	ctx.Request.ParseForm()
+	fmt.Println(ctx.Request.Form)
+	ctx.WriteString("success")
 }
 
 func GetMyInfo(ctx *context.Context) {

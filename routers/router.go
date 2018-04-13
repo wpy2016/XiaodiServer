@@ -16,6 +16,7 @@ func init() {
 	userRouter := beego.NewNamespace("/user",
 		beego.NSPost("/register", controllers.Register),
 		beego.NSPost("/login", controllers.Login),
+		beego.NSPost("/recharge", controllers.Recharge),
 		beego.NSPost("/get", controllers.AssertToken(controllers.GetMyInfo)),
 		beego.NSPost("/get/id", controllers.AssertToken(controllers.GetUserInfo)),
 		beego.NSPost("/auth", controllers.AssertToken(controllers.Auth)),

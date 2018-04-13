@@ -202,9 +202,9 @@ func RegisterDefaultUser(phone, decryptPass, nickName, imgPath string) *User {
 	user.NickName = nickName
 	user.UserType = conf.NORMAL_USER
 	user.Creditibility = 5.0
-	user.GoldMoney = 0
+	user.GoldMoney = conf.DEFAULt_GOLD_MONEY
 	user.Pass = decryptPass
-	user.SilverMoney = conf.DEFAULt_SLIVER_MONEY
+	user.SilverMoney = 0
 	user.Phone = phone
 	user.Img = imgPath
 	user.Token = bson.NewObjectId().Hex()

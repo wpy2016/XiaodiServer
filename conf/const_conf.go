@@ -6,9 +6,9 @@ const (
 	IMG_HEAD_HTTP               = "http://119.29.164.153:1688/picture/0/"
 	IMG_REWARD_HTTP             = "http://119.29.164.153:1688/picture/1/"
 
-	NORMAL_USER          = 0
-	XIAODI_YUAN          = 1
-	DEFAULt_SLIVER_MONEY = 300
+	NORMAL_USER        = 0
+	XIAODI_YUAN        = 1
+	DEFAULt_GOLD_MONEY = 300
 
 	THING_TYPE_EXPRESS = 0
 	THING_TYPE_FOOD    = 1
