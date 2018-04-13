@@ -22,6 +22,8 @@ func init() {
 		beego.NSPost("/sign", controllers.AssertToken(controllers.Sign)),
 		beego.NSPost("/sign/list", controllers.AssertToken(controllers.MySignList)),
 		beego.NSPost("/update/pass", controllers.AssertToken(controllers.UpdatePass)),
+		beego.NSPost("/get/onetoken", controllers.GetOneToken),
+		beego.NSPost("/auth/onetoken", controllers.AuthOneToken),
 		beego.NSPost("/update/nickname", controllers.AssertToken(controllers.UpdateNickname)),
 		beego.NSPost("/update/img", controllers.AssertToken(controllers.UpdateImg)),
 		beego.NSGet("/exist/nickname/:nickname", controllers.IsNickNameExist),

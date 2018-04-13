@@ -45,12 +45,6 @@ func (user *User) Save() {
 	}
 }
 
-//todo
-func UpdateUser(user *User) error {
-
-	return nil
-}
-
 func Login(phone, pass string) *User {
 	session, userC := getUserDbCollection()
 	defer session.Close()
@@ -243,6 +237,25 @@ func moveXiaodian(publisherId, receiverId string, xiaodian int) {
 	panic(BaseResp{conf.ERROR_USER_XIAODIAN_SHORT, conf.ERROR_USER_XIAODIAN_SHORT_MSG})
 }
 
+func UpdatePassByOneToken(phone, newDecryptPss string) {
+	session, userC := getUserDbCollection()
+	defer session.Close()
+	isExist, err := IsPhoneExist(phone)
+	if nil != err {
+		panic(err)
+	}
+	if !isExist {
+		panic(BaseResp{StatusCode: conf.ACCOUNT_NOT_EXIST, StatusMsg: conf.ACCOUNT_NOT_EXIST_MSG})
+	}
+	err = userC.Update(bson.M{conf.USER_PHONE: phone}, bson.M{
+		"$set": bson.M{
+			"pass": newDecryptPss,
+		}})
+	if nil != err {
+		panic(err)
+	}
+}
+
 func updateUser(user *User) {
 	GetUserById(user.ID) //主要用来检查错误，用户是否存在
 	session, userC := getUserDbCollection()
@@ -250,5 +263,17 @@ func updateUser(user *User) {
 	err := userC.Update(bson.M{conf.ID: user.ID}, user)
 	if nil != err {
 		panic(err)
+	}
+}
+
+func getXiaodianCenter() *BaseUser {
+	return &BaseUser{
+		ID:            "000000000",
+		NickName:      conf.XIAODIAN_CENTER,
+		RealName:      conf.XIAODIAN_CENTER,
+		Phone:         conf.SERVICE_PHONE,
+		UserType:      conf.XIAODI_YUAN,
+		Img:           conf.XIAODIAN_THUMBNAIL,
+		Creditibility: 5.0,
 	}
 }

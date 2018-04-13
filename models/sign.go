@@ -42,16 +42,44 @@ func SignToday(userId, day string) {
 			Days:   []string{day},
 		}
 		newSign.Save()
-		return
+		err = nil
+	} else {
+		if isSign(sign.Days, day) {
+			panic(BaseResp{StatusCode: conf.TODAY_IS_SIGN, StatusMsg: conf.TODAY_IS_SIGN_MSG})
+		}
+		sign.Days = append(sign.Days, day)
+		err = signC.Update(bson.M{conf.ID: sign.Id}, sign)
+		if nil != err {
+			panic(err)
+		}
 	}
-	if isSign(sign.Days, day) {
-		panic(BaseResp{StatusCode: conf.TODAY_IS_SIGN, StatusMsg: conf.TODAY_IS_SIGN_MSG})
+	//增加笑点
+	user := GetUserById(userId)
+	user.GoldMoney = user.GoldMoney + 1
+	updateUser(user)
+
+	//增加笑点记录
+	rewaridGiveXiaodianReward := Reward{
+		ID:             bson.NewObjectId().Hex(),
+		Publisher:      *getXiaodianCenter(),
+		State:          conf.REWARD_FINISH,
+		Phone:          conf.SERVICE_PHONE,
+		Xiaodian:       1,
+		DeadLine:       "",
+		OriginLocation: conf.XIAODIAN_CENTER,
+		DstLocation:    user.NickName,
+		Receiver:       *GetBaseUserById(userId),
+		PublisherGrade: 5.0,
+		ReceiveGrade:   5.0,
+		Describe:       conf.SIGN_ADD_XIAODIAN,
+		Thing: Thing{
+			ThingType: 3,
+			Thumbnail: conf.XIAODIAN_THUMBNAIL,
+			Weight:    "轻",
+		},
+		CreateTime: time.Now(),
 	}
-	sign.Days = append(sign.Days, day)
-	err = signC.Update(bson.M{conf.ID: sign.Id}, sign)
-	if nil != err {
-		panic(err)
-	}
+	rewaridGiveXiaodianReward.Save()
 }
 
 func isSign(days []string, day string) bool {

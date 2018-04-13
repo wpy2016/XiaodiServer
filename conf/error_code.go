@@ -77,4 +77,7 @@ const (
 
 	OLD_PASS_ERROR     = 3022
 	OLD_PASS_ERROR_MSG = "旧密码错误"
+
+	ACCOUNT_NOT_EXIST = 3023
+	ACCOUNT_NOT_EXIST_MSG = "账号不存在"
 )

@@ -11,6 +11,7 @@ const (
 	MGO_DB_TOKEN_COLLECTION  = "token"
 	MGO_DB_REWARD_COLLECTION = "reward"
 	MGO_DB_SIGN_COLLECTION   = "sign"
+	MGO_DB_ONE_TOKEN_COLLECTION   = "onetoken"
 
 	//section conf
 	ID                 = "_id"
