@@ -139,6 +139,13 @@ func ShowReward(ctx *context.Context) {
 	ctx.Output.JSON(rewardResp, true, false)
 }
 
+func ShowAllRewards(ctx *context.Context) {
+	ctx.Request.ParseForm()
+	rewards := models.ShowAllReward()
+	rewardResp := models.RewardResp{conf.SUCCESS, conf.SUCCESS_MSG, rewards}
+	ctx.Output.JSON(rewardResp, true, false)
+}
+
 func DeleteReward(ctx *context.Context) {
 	ctx.Request.ParseForm()
 	userId := ctx.Request.Form.Get(conf.REWARD_PUBLISH_USER_ID)

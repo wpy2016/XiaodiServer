@@ -79,6 +79,20 @@ func ShowReward(pages int) []Reward {
 	return rewards
 }
 
+func ShowAllReward() []Reward {
+	session, rewardC := getRewardDbCollection()
+	defer session.Close()
+	timeNow := time.Now()
+	timeStr := timeNow.Format(conf.TIME_FORMAT)
+	formatTime, _ := time.Parse(conf.TIME_FORMAT, timeStr)
+	var rewards []Reward
+	err := rewardC.Find(bson.M{conf.REWARD_DEADLINE_TIME: bson.M{"$gt": formatTime}, "state": conf.REWARD_SEND}).Sort("-create_time").All(&rewards)
+	if nil != err {
+		panic(errors.New("ShowAllReward" + err.Error()))
+	}
+	return rewards
+}
+
 func DeleteReward(id, userId string) {
 	session, rewardC := getRewardDbCollection()
 	defer session.Close()

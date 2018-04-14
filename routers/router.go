@@ -34,6 +34,7 @@ func init() {
 	rewardRouter := beego.NewNamespace("/reward",
 		beego.NSPost("/send", controllers.AssertToken(controllers.SendReward)),
 		beego.NSPost("/show", controllers.AssertToken(controllers.ShowReward)),
+		beego.NSPost("/show/all", controllers.AssertToken(controllers.ShowAllRewards)),
 		beego.NSPost("/show/our_not_finish", controllers.AssertToken(controllers.ShowRewardOurNotFinish)),
 		beego.NSPost("/show/my/send", controllers.AssertToken(controllers.ShowRewardMySend)),
 		beego.NSPost("/show/my/carry", controllers.AssertToken(controllers.ShowRewardMyCarry)),
